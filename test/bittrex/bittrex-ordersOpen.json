@@ -1,0 +1,74 @@
+[
+    {
+        "info": {
+            "Uuid": null,
+            "OrderUuid": "e45b2756-2d43-40c2-9cfa-cfb53ba98be9",
+            "Exchange": "BTC-LTC",
+            "OrderType": "LIMIT_BUY",
+            "Quantity": 1,
+            "QuantityRemaining": 1,
+            "Limit": 0.0070002,
+            "CommissionPaid": 0,
+            "Price": 0,
+            "PricePerUnit": null,
+            "Opened": "2017-12-02T10:48:44.363",
+            "Closed": null,
+            "CancelInitiated": false,
+            "ImmediateOrCancel": false,
+            "IsConditional": false,
+            "Condition": "NONE",
+            "ConditionTarget": null
+        },
+        "id": "e45b2756-2d43-40c2-9cfa-cfb53ba98be9",
+        "timestamp": 1512211724363,
+        "datetime": "2017-12-02T10:48:44.363Z",
+        "symbol": "LTC/BTC",
+        "type": "limit",
+        "side": "buy",
+        "price": 0,
+        "amount": 1,
+        "filled": 0,
+        "remaining": 1,
+        "status": "open",
+        "fee": {
+            "cost": 0,
+            "currency": "BTC"
+        }
+    },
+        {
+        "info": {
+            "Uuid": null,
+            "OrderUuid": "e45b2756-2d43-40c2-9cfa-cfb53ba98be9",
+            "Exchange": "BTC-LTC",
+            "OrderType": "LIMIT_BUY",
+            "Quantity": 1,
+            "QuantityRemaining": 1,
+            "Limit": 0.0070002,
+            "CommissionPaid": 0,
+            "Price": 0,
+            "PricePerUnit": null,
+            "Opened": "2017-12-02T10:48:44.363",
+            "Closed": null,
+            "CancelInitiated": false,
+            "ImmediateOrCancel": false,
+            "IsConditional": false,
+            "Condition": "NONE",
+            "ConditionTarget": null
+        },
+        "id": "e45b2756-2d43-40c2-9cfa-cfb53ba98be9",
+        "timestamp": 1512211724363,
+        "datetime": "2017-12-02T10:48:44.363Z",
+        "symbol": "LTC/BTC",
+        "type": "limit",
+        "side": "sell",
+        "price": 0,
+        "amount": 1,
+        "filled": 0,
+        "remaining": 1,
+        "status": "open",
+        "fee": {
+            "cost": 0,
+            "currency": "BTC"
+        }
+    }
+]

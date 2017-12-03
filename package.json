@@ -1,0 +1,27 @@
+{
+  "name": "crypto-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bittrexCronjob.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/robintenberge/crypto-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/robintenberge/crypto-app#readme",
+  "dependencies": {
+    "asyncawait": "^1.0.6",
+    "ccxt": "^1.9.29",
+    "fs-extra": "^4.0.2",
+    "mailgun-js": "^0.13.1",
+    "moment": "^2.19.3",
+    "node-cron": "^1.2.1",
+    "request": "^2.83.0"
+  },
+  "devDependencies": {}
+}
