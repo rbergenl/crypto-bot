@@ -5,6 +5,4 @@ phases:
       - npm start
 artifacts:
   files:
-    - appspec.yml
-    - target/SampleMavenTomcatApp.war
-    - scripts/*
+    - helloworld.txt
