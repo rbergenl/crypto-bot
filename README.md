@@ -7,6 +7,8 @@ Package used:
 https://www.npmjs.com/package/ccxt
 https://github.com/ccxt-dev/ccxt/wiki
 
+http://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/dynamodb-example-table-read-write.html
+
 
 # Had to fix the CCXT module:
 ``

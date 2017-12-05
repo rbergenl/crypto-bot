@@ -7,7 +7,7 @@ var doEmail = (process.argv[2] == '--email') ? true : false;
 
 var readDir = path.join('./log/bittrexReporter');
 var outDir = path.join('./log/bittrexTrend');
-var outFile = path.join(outDir, moment().format("YYYY-MM-DD_HHmm").toUpperCase() + '_bittrexTrend.txt');
+var outFile = path.join(outDir, moment().format("YYYY-MM-DD_HHmm").toUpperCase() + '.txt');
 
 // always make sure the outDir exists
 fs.mkdirsSync(outDir);
@@ -42,6 +42,7 @@ for( var i = 0; i < reports.length; i++ ){
 }
 let average24h_change = parseFloat((sum / reports.length).toFixed(2));
 let percent = 1 + (average24h_change / 100);
+if (percent == 1) percent = 1.0001; // when there is no change, it will never reach a million (and the calculation will get in a loop)
 
 let text = currentPortfolio()
             + whenMillionaire(0)

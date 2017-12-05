@@ -1,0 +1,13 @@
+0) today (2017-12-05) you have:  
+    USD 153.  
+    BTC 0.01310128.  
+    BTC_USDT 11680.  
+    (average24h_change 0)
+    
+1) in 100 days (2018-03-15) you have:
+    USD 251.
+    BTC 0.01.
+    BTC_USDT 19233 (1.005).
+    (average24h_change 0)
+    - if you contribute 0 now.
+    

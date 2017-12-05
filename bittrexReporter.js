@@ -73,7 +73,7 @@ fs.mkdirsSync(outDir);
         // calculate 24h value change
         report['value_btc_change_24h'] = 0;
         
-        let file = path.join(outDir, dateTimeStampOneDayAgo + '_bittrexReporter.json');
+        let file = path.join(outDir, dateTimeStampOneDayAgo + '.json');
         
         (async () => {
             fs.stat(file, function(err, stat) {
@@ -86,7 +86,7 @@ fs.mkdirsSync(outDir);
                     
                 } else if(err.code == 'ENOENT') {
                     // file does not exist
-                    console.log('report from one days ago does not exist');
+                    console.log('report from one day ago does not exist');
                 } else {
                     console.log('Some other error: ', err.code);
                 }
@@ -98,6 +98,6 @@ fs.mkdirsSync(outDir);
         console.error(e);
     } 
 
-    await util.logJSON(report, path.join(outDir, dateTimeStamp + '_bittrexReporter.json'));
+    await util.logJSON(report, path.join(outDir, dateTimeStamp + '.json'));
     
 })();

@@ -19,7 +19,7 @@ if (BASE_CURRENCY !== 'ETH' & BASE_CURRENCY !== 'BTC') {
     process.exit(0);
 }
 
-var outDir = path.join('./log/bittrex' + BASE_CURRENCY + 'Tsunami', dateTimeStamp);
+var outDir = path.join('./log/bittrexTsunami_' + BASE_CURRENCY);
 
 // always make sure the outDir exists
 fs.mkdirsSync(outDir);
@@ -148,7 +148,7 @@ fs.mkdirsSync(outDir);
     // and that ascending order, make it descending (highest on top)
     .reverse();
 
-    
+    //================= Continue from here with one selected ticker
     // only execute one order and if TsunamiScore is above 2
     let oneSelectedTicker = selectedTickers.slice(0, 1);
     if (oneSelectedTicker[0] && oneSelectedTicker[0].bidsTsunamiScore < MIN_TSUNAMI_SCORE) oneSelectedTicker.splice(0, 1) // remove first item
@@ -203,19 +203,21 @@ fs.mkdirsSync(outDir);
         console.log(e);
     }
     
+    
+        
     //========== Check how much balance is available of each coin/token
     try {
-        // wait 30 seconds for the buy order to be processed; then place the sell order
-        console.log('sleeping 30 seconds before executing api calls');
-        child_process.execSync('sleep 30');
-    
-        // get fresh new updated balances
-        bittrexBalances = await bittrexAPI.getBalances();
-        
-       
-        
-        for (let market of selectedTickers) {
+
+        // place the sell order for the 
+        for (let market of oneSelectedTicker) {
             
+            // wait 30 seconds for the buy order to be processed; then place the sell order
+            console.log('sleeping 30 seconds before executing api calls');
+            child_process.execSync('sleep 30');
+            
+            // get fresh new updated balances
+            bittrexBalances = await bittrexAPI.getBalances();
+        
             // get only the balance for the specific market (BCC was only avaiable in the info array... they dont keep updated)
             let availableUnits;
             let currentMarketBalance = bittrexBalances.info.filter(function(ticker){
@@ -284,11 +286,14 @@ fs.mkdirsSync(outDir);
         console.log(e);
     } 
     
-    await util.logJSON(ordersCancelled, path.join(outDir, 'ordersCancelled.json'));
-    await util.logJSON(selectedTickers, path.join(outDir, 'selectedTickers.json'));
-    await util.logJSON(buyOrders, path.join(outDir, 'buyOrders.json'));
-    await util.logJSON(buyOrdersPlaced, path.join(outDir, 'buyOrdersPlaced.json'));
-    await util.logJSON(calculatedOrders, path.join(outDir, 'calculatedOrders.json'));
-    await util.logJSON(sellOrdersPlaced, path.join(outDir, 'sellOrdersPlaced.json'));
+    let jsonOut = {
+        ordersCancelled: ordersCancelled,
+        selectedTickers: selectedTickers,
+        buyOrders: buyOrders,
+        buyOrdersPlaced: buyOrdersPlaced,
+        calculatedOrders: calculatedOrders,
+        sellOrdersPlaced: sellOrdersPlaced
+    }
+    await util.logJSON(jsonOut, path.join(outDir, dateTimeStamp + '.json'));
     
 })();
