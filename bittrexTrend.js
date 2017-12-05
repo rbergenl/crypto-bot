@@ -170,7 +170,7 @@ var mailgun = mailGun({apiKey: api_key, domain: domain});
 
 var data = {
   from: 'Crypto Bot <me@samples.mailgun.org>',
-  to: 'rberge.nl@gmail.com',
+  to: process.env.MAILGUN_TO_EMAIL,
   subject: 'Daily Bittrex BTC Status',
   text: text
 };

@@ -3,6 +3,3 @@ phases:
   build:
     commands:
       - npm start
-artifacts:
-  files:
-    - helloworld.txt
