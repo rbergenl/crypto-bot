@@ -30,13 +30,7 @@ cron.schedule(hourly, function(){
 
 // run 1 minute past 12 at night
 cron.schedule(nightly, function(){
-    let command = 'node bittrexReporter';
+    let command = 'node bittrexReporter --email';
     console.log(moment().format("YYYY-MM-DD_HHmm") + ': $ ' + command);
     child_process.execSync(command);
-    
-    child_process.execSync('sleep 30');
-    
-    let command2 = 'node bittrexTrend --email';
-    console.log(moment().format("YYYY-MM-DD_HHmm") + ': $ ' + command2);
-    child_process.execSync(command2);
 });

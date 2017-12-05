@@ -1,16 +1,9 @@
 var moment = require('moment');
 var fs = require('fs-extra');
 var path = require('path');
-var mailGun = require('mailgun-js');
 
-var doEmail = (process.argv[2] == '--email') ? true : false;
 
 var readDir = path.join('./log/bittrexReporter');
-var outDir = path.join('./log/bittrexTrend');
-var outFile = path.join(outDir, moment().format("YYYY-MM-DD_HHmm").toUpperCase() + '.txt');
-
-// always make sure the outDir exists
-fs.mkdirsSync(outDir);
 
 // constants
 let ONE_HUNDRED_DAYS_FROM_NOW = moment().add(100, 'days'); //snapshot date 100 days from now
@@ -44,16 +37,15 @@ let average24h_change = parseFloat((sum / reports.length).toFixed(2));
 let percent = 1 + (average24h_change / 100);
 if (percent == 1) percent = 1.0001; // when there is no change, it will never reach a million (and the calculation will get in a loop)
 
-let text = currentPortfolio()
+
+module.exports.getText = function() {
+    let text = currentPortfolio()
             + whenMillionaire(0)
             + whenMillionaire(1000)
             + valueInOneHundredDays()
             + howMuchNeededNowToBeMillionaireInOneHundredDays();
-            
-fs.writeFile(outFile, text, function (err) {
-  if (err) return console.log(err);
-  console.log('file saved: ' + outFile);
-});
+    return text;
+};
 
 
 //====================================== IMPLEMENTATION DETAILS =======================
@@ -165,19 +157,3 @@ function howMuchNeededNowToBeMillionaireInOneHundredDays() {
 `;
 }
 
-var api_key = process.env.MAILGUN_API_KEY;
-var domain = 'sandbox811c617bc5884829bca1a2b832d887c2.mailgun.org';
-var mailgun = mailGun({apiKey: api_key, domain: domain});
-
-var data = {
-  from: 'Crypto Bot <me@samples.mailgun.org>',
-  to: process.env.MAILGUN_TO_EMAIL,
-  subject: 'Daily Bittrex BTC Status',
-  text: text
-};
-
-if (doEmail) {
-    mailgun.messages().send(data, function (error, body) {
-      console.log(body);
-    });
-}
