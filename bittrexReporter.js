@@ -1,24 +1,14 @@
-var fs = require('fs-extra');
-var path = require('path');
-var util = require('./util/util');
 var moment = require('moment');
 var mailGun = require('mailgun-js');
 
 let bittrexAPI = require('./api/bittrex');
+var util = require('./util/util');
 
 let bittrexTrend = require('./bittrexTrend');
 
 var doEmail = (process.argv[2] == '--email') ? true : false;
 
-var date = moment(); //snapshot the moment and work with that
-var dateTimeStamp = date.format("YYYY-MM-DD_HHmm").toUpperCase();
-var dateTimeStampOneDayAgo = date.subtract(1, 'day').format("YYYY-MM-DD_HHmm").toUpperCase();
-
-var outDir = path.join('./log/bittrexReporter');
-
-// always make sure the outDir exists
-fs.mkdirsSync(outDir);
-
+const SLUG = 'bittrexReporter';
 
 (async () => {
     let bittrexMarketSummaries;
@@ -29,7 +19,7 @@ fs.mkdirsSync(outDir);
         bittrexMarketSummaries = await bittrexAPI.getMarketsSummaries();
         bittrexBalances = await bittrexAPI.getBalances();
         
-        report['datetime'] = dateTimeStamp;
+        report['datetime'] = moment();
         
         // get btc_usd rate
         report['btc_usdt'] = bittrexMarketSummaries.filter(function(market){
@@ -77,33 +67,45 @@ fs.mkdirsSync(outDir);
         // calculate 24h value change
         report['value_btc_change_24h'] = 0;
         
-        let file = path.join(outDir, dateTimeStampOneDayAgo + '.json');
+        try {
+            let previousReport = util.readJSON(SLUG, {daysAgo: 1});
+            
+            report.value_btc_change_24h = (1 - (previousReport.value_btc / report.value_btc));
+            report.value_btc_change_24h =  parseFloat((report.value_btc_change_24h).toFixed(2));
+        }
+        catch(e) {
+            util.writeJSON('error', e);
+            console.error('report from one day ago does not exist, cannot compare, so value_btc_change_24h will be 0');
+        }
         
-        (async () => {
-            fs.stat(file, function(err, stat) {
-                if(err == null) {
-                    console.log('File exists');
-                    let previousReport = require('./' + file);
-                    
-                    report.value_btc_change_24h = (1 - (previousReport.value_btc / report.value_btc));
-                    report.value_btc_change_24h =  parseFloat((report.value_btc_change_24h).toFixed(2));
-                    
-                } else if(err.code == 'ENOENT') {
-                    // file does not exist
-                    console.log('report from one day ago does not exist');
-                } else {
-                    console.log('Some other error: ', err.code);
-                }
-            });
-        })();
+        // calculate 7d value change
+        report['value_btc_change_7d'] = 0;
+        
+        try {
+            let latestReports = util.readAllJSON('bittrexReporter', {onlyLast: 7});
+            
+            // calculate average 24h from past week
+            let sum = 0;
+            for(var i = 0; i < latestReports.length; i++ ){
+                sum += parseFloat(latestReports[i].value_btc_change_24h, 10); //don't forget to add the base
+            }
+            
+            report.value_btc_change_7d = parseFloat((sum / latestReports.length).toFixed(2));
+        }
+        catch(e) {
+            util.writeJSON('error', e);
+            console.error(e);
+        }
         
     }
     catch(e) {
+        util.writeJSON('error', e);
         console.error(e);
     } 
     
+
     //======================= Get the trend, attach it to the report and send it via email
-    var text = bittrexTrend.getText();
+    var text = bittrexTrend.getText(report);
     report['trend'] = text;
     
     try {
@@ -126,10 +128,11 @@ fs.mkdirsSync(outDir);
         
     }
     catch(e) {
+        util.writeJSON('error', e);
         console.error(e);
     }
     
-    await util.logJSON(report, path.join(outDir, dateTimeStamp + '.json'));
+    await util.writeJSON(SLUG, report);
     
 })();
 

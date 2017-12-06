@@ -1,17 +1,9 @@
-var fs = require('fs-extra');
-var path = require('path');
 var child_process = require('child_process');
 var moment = require('moment');
 
 var util = require('./util/util');
 
 let bittrexAPI = require('./api/bittrex');
-//let coinmarketcapAPI = require('./api/coinmarketcap');
-
-var date = moment(); //snapshot the moment and work with that
-
-var dateTimeStamp = date.format("YYYY-MM-DD_HHmm").toUpperCase();
-
 
 const BASE_CURRENCY = process.argv[2];
 if (BASE_CURRENCY !== 'ETH' & BASE_CURRENCY !== 'BTC') {
@@ -19,18 +11,16 @@ if (BASE_CURRENCY !== 'ETH' & BASE_CURRENCY !== 'BTC') {
     process.exit(0);
 }
 
-var outDir = path.join('./log/bittrexTsunami_' + BASE_CURRENCY);
+const SLUG = 'bittrexTsunami_' + BASE_CURRENCY;
 
-// always make sure the outDir exists
-fs.mkdirsSync(outDir);
+const LEAVE_BACKUP_FOR_HIGHER_ACTUAL_RATE                   = 0.0001;
+const FEE_PERCENTAGE                                        = 0.0025; // fee = actual price * percentage (paid = 10 units * 1 eth + (1 * 0.0025))
+const TARGET_PERCENT                                        = 1.0125; // +1.25%
+const MIN_TSUNAMI_SCORE                                     = 2;
+
 
 (async () => {
-    
-    const LEAVE_BACKUP_FOR_HIGHER_ACTUAL_RATE                   = 0.0001;
-    const FEE_PERCENTAGE                                        = 0.0025; // fee = actual price * percentage (paid = 10 units * 1 eth + (1 * 0.0025))
-    const TARGET_PERCENT                                        = 1.0125; // +1.25%
-    const MIN_TSUNAMI_SCORE                                     = 2;
-    
+
     let bittrexMarketSummaries;
      
     let selectedTickers = [];
@@ -52,6 +42,7 @@ fs.mkdirsSync(outDir);
         bittrexOpenOrders = await bittrexAPI.getOpenOrders();
     }
     catch(e) {
+        util.writeJSON('error', e);
         console.error(e);
     }   
         
@@ -63,19 +54,19 @@ fs.mkdirsSync(outDir);
             
             // if it is a buy order; than just cancel that order (it might be partially filled)
             if(order.side == 'buy') {
-                let log = await bittrexAPI.cancelOrder(order.id);
+                await bittrexAPI.cancelOrder(order.id);
                 ordersCancelled.push(order);
             }
             
             // if it is a sell order open for longer than 6 hours, cancel that order (all other sell orders stay open)
             if(order.side == 'sell') {
-                let now = date;
+                let now = moment();
                 let then = order.datetime;
-                let minutesAgo = moment.duration(now.diff(then)).minutes()
+                let minutesAgo = moment.duration(now.diff(then)).minutes();
                 let sixHours = 360;
                 
                 if (minutesAgo > sixHours) {
-                    let log = await bittrexAPI.cancelOrder(order.id);
+                    await bittrexAPI.cancelOrder(order.id);
                     ordersCancelled.push(order);
                 }
 
@@ -84,6 +75,7 @@ fs.mkdirsSync(outDir);
 
     }
     catch(e) {
+        util.writeJSON('error', e);
         console.error(e);
     }
     
@@ -106,6 +98,7 @@ fs.mkdirsSync(outDir);
         
     }
     catch(e) {
+        util.writeJSON('error', e);
         console.error(e);
     }
 
@@ -134,10 +127,11 @@ fs.mkdirsSync(outDir);
             selectedTickers[index].bidsTsunamiScore = orderBook.bidsTsunamiScore;
             tickersToGo--;
             index++;
-        };
+        }
 
     }
     catch(e) {
+        util.writeJSON('error', e);
         console.error(e);
     }
     
@@ -151,7 +145,7 @@ fs.mkdirsSync(outDir);
     //================= Continue from here with one selected ticker
     // only execute one order and if TsunamiScore is above 2
     let oneSelectedTicker = selectedTickers.slice(0, 1);
-    if (oneSelectedTicker[0] && oneSelectedTicker[0].bidsTsunamiScore < MIN_TSUNAMI_SCORE) oneSelectedTicker.splice(0, 1) // remove first item
+    if (oneSelectedTicker[0] && oneSelectedTicker[0].bidsTsunamiScore < MIN_TSUNAMI_SCORE) oneSelectedTicker.splice(0, 1); // remove first item
 
     //================== Now create the buy orders based on available balance
     try {
@@ -166,7 +160,7 @@ fs.mkdirsSync(outDir);
             bittrexBalances = await bittrexAPI.getBalances();
             
             // there is just one chosen ticker (with most volume); give that one the half of available balance; keep a bit for next ticker hour later
-            let eachShare = ((bittrexBalances[BASE_CURRENCY].free - LEAVE_BACKUP_FOR_HIGHER_ACTUAL_RATE) / 2).toFixed(8)
+            let eachShare = ((bittrexBalances[BASE_CURRENCY].free - LEAVE_BACKUP_FOR_HIGHER_ACTUAL_RATE) / 2).toFixed(8);
             // below is share for no matter how many choosenTickers; and the division is going wrong I guess ( / 4, / 3, /2,.. is not fair)
             //let eachShare = ((bittrexBalances[BASE_CURRENCY].free - LEAVE_BACKUP_FOR_HIGHER_ACTUAL_RATE) / tickersToGo).toFixed(8);
             eachShare -= (eachShare * FEE_PERCENTAGE).toFixed(8);
@@ -174,12 +168,12 @@ fs.mkdirsSync(outDir);
             
             // guard conditions
             if (bittrexBalances[BASE_CURRENCY].free == 0) {
-                buyOrders.push({"msg": BASE_CURRENCY + ' balance is 0'})
+                buyOrders.push({"msg": BASE_CURRENCY + ' balance is 0'});
                 continue; // make sure there is at least balance available
             }
             
             if (eachShare < 0.0005) {
-                buyOrders.push({"msg": market.MarketName + ': order of ' + BASE_CURRENCY + ' ' + eachShare + ' would not be sufficient.'})
+                buyOrders.push({"msg": market.MarketName + ': order of ' + BASE_CURRENCY + ' ' + eachShare + ' would not be sufficient.'});
                 continue; // make sure the order is big enough DUST_TRADE_DISALLOWED_MIN_VALUE_50K_SAT
             }
             
@@ -200,6 +194,7 @@ fs.mkdirsSync(outDir);
         
     }
     catch(e) {
+        util.writeJSON('error', e);
         console.log(e);
     }
     
@@ -245,6 +240,7 @@ fs.mkdirsSync(outDir);
         }
     }
     catch(e) {
+        util.writeJSON('error', e);
         console.log(e);
     }    
     
@@ -265,7 +261,7 @@ fs.mkdirsSync(outDir);
             if (free.Currency != 'ETH' && free.Currency != 'BTC' && free.Currency != 'USDT') {
                 let market = bittrexMarketSummaries.filter(function(market){
                     return market.MarketName.split('-')[0] == BASE_CURRENCY // Select basecurrency markets only
-                        && market.MarketName.split('-')[1] == free.Currency
+                        && market.MarketName.split('-')[1] == free.Currency;
                 });
 
                 let order = {
@@ -283,9 +279,11 @@ fs.mkdirsSync(outDir);
         
     }
     catch(e) {
+        util.writeJSON('error', e);
         console.log(e);
     } 
     
+
     let jsonOut = {
         ordersCancelled: ordersCancelled,
         selectedTickers: selectedTickers,
@@ -293,7 +291,8 @@ fs.mkdirsSync(outDir);
         buyOrdersPlaced: buyOrdersPlaced,
         calculatedOrders: calculatedOrders,
         sellOrdersPlaced: sellOrdersPlaced
-    }
-    await util.logJSON(jsonOut, path.join(outDir, dateTimeStamp + '.json'));
+    };
     
+    await util.writeJSON(SLUG, jsonOut);
+   
 })();
