@@ -45,8 +45,9 @@ module.exports.getMarketsSummaries = function() {
                     TwoHourAgoJson = util.readJSON(SLUG, {hoursAgo: 2});
                 }
                 catch(e) {
-                    util.writeJSON('error', e);
-                    console.log('could not find previous bittrex market summaries (1 or 2 hours ago); so using just fetched one');
+                    let error = 'could not find previous bittrex market summaries (1 or 2 hours ago); so using just fetched one';
+                    util.writeJSON('error', error);
+                    console.log(error);
                     OneHourAgoJson = fetchedJson.result; // as fallback, use fetchedJson (thus volume_change_1h would be 0 for each ticker)
                     TwoHourAgoJson = fetchedJson.result; // as fallback, use fetchedJson (thus volume_change_2h would be 0 for each ticker)
                 }
