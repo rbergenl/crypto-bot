@@ -17,7 +17,7 @@ const LEAVE_BACKUP_FOR_HIGHER_ACTUAL_RATE                   = 0.0001;
 const FEE_PERCENTAGE                                        = 0.0025; // fee = actual price * percentage (paid = 10 units * 1 eth + (1 * 0.0025))
 const TARGET_PERCENT                                        = 1.0125; // +1.25%
 const MIN_TSUNAMI_SCORE                                     = 2;
-
+const CANCEL_ORDER_AFTER_MINUTES                            = 360;
 
 (async () => {
 
@@ -42,8 +42,7 @@ const MIN_TSUNAMI_SCORE                                     = 2;
         bittrexOpenOrders = await bittrexAPI.getOpenOrders();
     }
     catch(e) {
-        util.writeJSON('error', e);
-        console.error(e);
+        util.throwError(e);
     }   
         
 
@@ -63,9 +62,8 @@ const MIN_TSUNAMI_SCORE                                     = 2;
                 let now = moment();
                 let then = order.datetime;
                 let minutesAgo = moment.duration(now.diff(then)).minutes();
-                let sixHours = 360;
                 
-                if (minutesAgo > sixHours) {
+                if (minutesAgo > CANCEL_ORDER_AFTER_MINUTES) {
                     await bittrexAPI.cancelOrder(order.id);
                     ordersCancelled.push(order);
                 }
@@ -75,8 +73,7 @@ const MIN_TSUNAMI_SCORE                                     = 2;
 
     }
     catch(e) {
-        util.writeJSON('error', e);
-        console.error(e);
+        util.throwError(e);
     }
     
     //========== Select markets
@@ -98,8 +95,7 @@ const MIN_TSUNAMI_SCORE                                     = 2;
         
     }
     catch(e) {
-        util.writeJSON('error', e);
-        console.error(e);
+        util.throwError(e);
     }
 
     // Then choose the top five with the most volume
@@ -131,8 +127,7 @@ const MIN_TSUNAMI_SCORE                                     = 2;
 
     }
     catch(e) {
-        util.writeJSON('error', e);
-        console.error(e);
+        util.throwError(e);
     }
     
     // Then choose the one with the highest tsunamiScore
@@ -194,8 +189,7 @@ const MIN_TSUNAMI_SCORE                                     = 2;
         
     }
     catch(e) {
-        util.writeJSON('error', e);
-        console.log(e);
+        util.throwError(e);
     }
     
     
@@ -207,8 +201,8 @@ const MIN_TSUNAMI_SCORE                                     = 2;
         for (let market of oneSelectedTicker) {
             
             // wait 30 seconds for the buy order to be processed; then place the sell order
-            console.log('sleeping 30 seconds before executing api calls');
-            child_process.execSync('sleep 30');
+            console.log('sleeping 10 seconds before executing api calls');
+            child_process.execSync('sleep 10');
             
             // get fresh new updated balances
             bittrexBalances = await bittrexAPI.getBalances();
@@ -240,8 +234,7 @@ const MIN_TSUNAMI_SCORE                                     = 2;
         }
     }
     catch(e) {
-        util.writeJSON('error', e);
-        console.log(e);
+        util.throwError(e);
     }    
     
 
@@ -279,10 +272,8 @@ const MIN_TSUNAMI_SCORE                                     = 2;
         
     }
     catch(e) {
-        util.writeJSON('error', e);
-        console.log(e);
-    } 
-    
+        util.throwError(e);
+    }
 
     let jsonOut = {
         ordersCancelled: ordersCancelled,
