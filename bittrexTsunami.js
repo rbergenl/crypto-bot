@@ -38,7 +38,7 @@ const CANCEL_ORDER_AFTER_MINUTES                            = 360;
    
    //========== fetch market summaries and open orders
     try {
-        bittrexMarketSummaries = await bittrexAPI.getMarketsSummaries();
+        bittrexMarketSummaries = await bittrexAPI.getMarketsSummaries({save:true});
         bittrexOpenOrders = await bittrexAPI.getOpenOrders();
     }
     catch(e) {

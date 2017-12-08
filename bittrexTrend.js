@@ -31,7 +31,7 @@ module.exports.getText = function(report) {
 
 function currentPortfolio(currentReport) {
     
-    return `${CONSOLE_INDEX++}) today (${moment().format("YYYY-MM-DD")}) you have:  
+    let msg = `${CONSOLE_INDEX++}) today (${moment().format("YYYY-MM-DD")}) you have:  
     USD ${parseInt(currentReport.btc_usdt * currentReport.value_btc, 10)}.  
     BTC ${currentReport.value_btc}.
     BTC_USDT ${currentReport.btc_usdt}.
@@ -39,6 +39,11 @@ function currentPortfolio(currentReport) {
     7D_CHANGE ${currentReport.value_btc_change_7d}.
     
 `;
+    for(let order of currentReport.orders) {
+        msg += `${order.time} - ${order.symbol} - ${order.side} - ${order.status} - ${order.filled}\n`;
+    }
+return msg + '\n';
+
 }
 
 

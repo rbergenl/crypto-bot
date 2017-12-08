@@ -1,0 +1,39 @@
+{
+    "datetime": "2017-12-08T20:35:03.520Z",
+    "btc_usdt": 15027,
+    "value_btc": 0.01310126,
+    "value_usd": 196.87,
+    "value_btc_change_24h": 0,
+    "value_btc_change_7d": null,
+    "orders": [
+        {
+            "symbol": "XMR/BTC",
+            "side": "sell",
+            "status": "closed",
+            "filled": 0.36895161,
+            "time": "02:07:43"
+        },
+        {
+            "symbol": "XMR/BTC",
+            "side": "buy",
+            "status": "closed",
+            "filled": 0.36895161,
+            "time": "02:07:12"
+        },
+        {
+            "symbol": "XZC/BTC",
+            "side": "sell",
+            "status": "closed",
+            "filled": 1.88053234,
+            "time": "12:07:48"
+        },
+        {
+            "symbol": "XZC/BTC",
+            "side": "buy",
+            "status": "closed",
+            "filled": 1.88053234,
+            "time": "12:07:17"
+        }
+    ],
+    "trend": "0) today (2017-12-08) you have:  \n    USD 196.  \n    BTC 0.01310126.\n    BTC_USDT 15027.\n    24H_CHANGE 0.\n    7D_CHANGE NaN.\n    \n1) in a day (2017-12-09) you have:\n    USD NaN.\n    BTC NaN (NaN).\n    BTC_USDT 15102 (1.005).\n    - if you contribute 0 now.\n    \n2) in a day (2017-12-09) you have:\n    USD NaN.\n    BTC NaN (NaN).\n    BTC_USDT 15102 (1.005).\n    - if you contribute 1000 now.\n    \n3) in 100 days (2018-03-18) you have:\n    USD NaN.\n    BTC NaN  (NaN).\n    BTC_USDT 24744 (1.005).\n    - if you contribute 0 now.\n    \n4) in 100 days (2018-03-18) you have:\n    USD 1000000. \n    BTC NaN (NaN).\n    BTC_USDT 24744 (1.005).\n    - if you contribute 100 now.\n\n"
+}

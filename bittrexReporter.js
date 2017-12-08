@@ -18,6 +18,7 @@ if (moment().hours() != 0) {
 (async () => {
     let bittrexMarketSummaries;
     let bittrexBalances;
+    let bittrexOrders;
     let report = {};
     
     try {
@@ -105,6 +106,31 @@ if (moment().hours() != 0) {
         util.throwError(e);
     } 
     
+    
+    try {
+        bittrexOrders = await bittrexAPI.getOrders();
+        
+        // only orders from past 24h
+        let now = moment();
+        bittrexOrders = bittrexOrders.filter(function(order){
+            let then = order.datetime;
+            let daysAgo = moment.duration(now.diff(then)).days();
+            return daysAgo == 5; // should be 0 (so within last 24 hours)
+        }).map(function(order){
+            return {
+                symbol: order.symbol,
+                side: order.side,
+                status: order.status,
+                filled: order.filled,
+                time: moment(order.timestamp).format('hh:mm:ss')
+            };
+        });
+        
+        report['orders'] = bittrexOrders;
+    }
+    catch(e) {
+        util.throwError(e);
+    }  
 
     //======================= Get the trend, attach it to the report and send it via email
     var text = bittrexTrend.getText(report);
@@ -133,6 +159,7 @@ if (moment().hours() != 0) {
         util.throwError(e);
     }
     
+    //await util.writeJSON(SLUG, report, {toFile:true});
     await util.writeJSON(SLUG, report);
     
 })();

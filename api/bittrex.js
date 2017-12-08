@@ -26,7 +26,7 @@ module.exports.getMarkets = function() {
     });
 };
 
-module.exports.getMarketsSummaries = function() {
+module.exports.getMarketsSummaries = function(options = {}) {
     
     const SLUG = 'bittrex_marketsSummaries';
     
@@ -77,7 +77,8 @@ module.exports.getMarketsSummaries = function() {
                         return ticker;
                     });
                     
-                    await util.writeJSON(SLUG, calculatedJson);
+                    if (options.save) await util.writeJSON(SLUG, calculatedJson);
+                    
                     resolve(calculatedJson);
                 })();
               }
