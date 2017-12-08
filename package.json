@@ -4,11 +4,12 @@
   "description": "",
   "main": "bittrexCronjob.js",
   "engines": {
-    "node" : "8.9.1"
+    "node": "8.9.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node bittrexTsunami BTC"
+    "set_aws": "mkdir -p ~/.aws && echo \"[default]\naws_access_key_id=${AWS_KEY_ID}\naws_secret_access_key=${AWS_SECRET}\" > ~/.aws/credentials",
+    "start": "npm run set_aws && node bittrexTsunami BTC"
   },
   "repository": {
     "type": "git",
@@ -19,15 +20,15 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/robintenberge/crypto-app#readme",
   "dependencies": {
-    "asyncawait": "^1.0.6",
-    "aws-sdk": "^2.163.0",
-    "ccxt": "^1.9.29",
-    "fs-extra": "^4.0.2",
-    "mailgun-js": "^0.13.1",
-    "moment": "^2.19.3",
-    "node-cron": "^1.2.1",
-    "node-uuid": "^1.4.8",
-    "request": "^2.83.0"
+    "asyncawait": "1.0.6",
+    "aws-sdk": "2.163.0",
+    "ccxt": "1.10.323",
+    "fs-extra": "4.0.2",
+    "mailgun-js": "0.13.1",
+    "moment": "2.19.3",
+    "node-cron": "1.2.1",
+    "node-uuid": "1.4.8",
+    "request": "2.83.0"
   },
   "devDependencies": {}
 }
