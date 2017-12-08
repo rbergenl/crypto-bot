@@ -28,7 +28,7 @@ module.exports.writeJSON = function(slug, data, options) {
                 });
             } else {
                 await dynamo.save(slug, dateTimeStamp, data);
-                console.log("Saved to DynamoDB: " + slug + " - " + dateTimeStamp);
+                console.log(dateTimeStamp + ": saved to DynamoDB: " + slug);
                 resolve();
             }
             
@@ -81,6 +81,6 @@ module.exports.readJSON = function(slug, options) {
 
 
 module.exports.throwError = function(e){
-    require('./util').writeJSON('error', e);
-    console.log(e);
+    //require('./util').writeJSON('error', e);
+    console.log(dateTimeStamp + ': ' + e);
 };

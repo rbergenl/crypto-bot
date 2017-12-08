@@ -98,7 +98,7 @@ module.exports.getBalances = function() {
                 
                 //let bittrexMarkets          = await bittrexCCXT.loadMarkets()
                 let json = await bittrexCCXT.fetchBalance();
-                await util.writeJSON(SLUG, json);
+                //await util.writeJSON(SLUG, json);
                 resolve(json);
             }
         })();
@@ -144,7 +144,7 @@ module.exports.getOrders = function() {
                 resolve(require('../test/bittrex/bittrex-orders.json'));
             } else {
                 let json = await bittrexCCXT.fetchOrders();
-                await util.writeJSON(SLUG, json);
+               // await util.writeJSON(SLUG, json);
                 resolve(json);
             }
         })();
@@ -161,7 +161,7 @@ module.exports.getOpenOrders = function() {
                 resolve(require('../test/bittrex/bittrex-ordersOpen.json'));
             } else {
                 let json = await bittrexCCXT.fetchOpenOrders();
-                await util.writeJSON(SLUG, json);
+                //await util.writeJSON(SLUG, json);
                 resolve(json);
             }
         })();
