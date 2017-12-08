@@ -68,21 +68,20 @@ const SLUG = 'bittrexReporter';
         report['value_btc_change_24h'] = 0;
         
         try {
-            let previousReport = util.readJSON(SLUG, {daysAgo: 1});
+            let previousReport = await util.readJSON(SLUG, {daysAgo: 1, onlyLast:1});
             
             report.value_btc_change_24h = (1 - (previousReport.value_btc / report.value_btc));
             report.value_btc_change_24h =  parseFloat((report.value_btc_change_24h).toFixed(2));
         }
         catch(e) {
-            util.writeJSON('error', e);
-            console.error('report from one day ago does not exist, cannot compare, so value_btc_change_24h will be 0');
+            util.throwError('report from one day ago does not exist, cannot compare, so value_btc_change_24h will be 0');
         }
         
         // calculate 7d value change
         report['value_btc_change_7d'] = 0;
         
         try {
-            let latestReports = util.readAllJSON('bittrexReporter', {onlyLast: 7});
+            let latestReports = await util.readJSON('bittrexReporter', {onlyLast: 7});
             
             // calculate average 24h from past week
             let sum = 0;
@@ -93,14 +92,12 @@ const SLUG = 'bittrexReporter';
             report.value_btc_change_7d = parseFloat((sum / latestReports.length).toFixed(2));
         }
         catch(e) {
-            util.writeJSON('error', e);
-            console.error(e);
+            util.throwError(e);
         }
         
     }
     catch(e) {
-        util.writeJSON('error', e);
-        console.error(e);
+        util.throwError(e);
     } 
     
 
@@ -128,8 +125,7 @@ const SLUG = 'bittrexReporter';
         
     }
     catch(e) {
-        util.writeJSON('error', e);
-        console.error(e);
+        util.throwError(e);
     }
     
     await util.writeJSON(SLUG, report);

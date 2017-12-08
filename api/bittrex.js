@@ -40,19 +40,24 @@ module.exports.getMarketsSummaries = function() {
                 var OneHourAgoJson;
                 var TwoHourAgoJson;
 
-                try {
-                    OneHourAgoJson = util.readJSON(SLUG, {hoursAgo: 1});
-                    TwoHourAgoJson = util.readJSON(SLUG, {hoursAgo: 2});
-                }
-                catch(e) {
-                    let error = 'could not find previous bittrex market summaries (1 or 2 hours ago); so using just fetched one';
-                    util.writeJSON('error', error);
-                    console.log(error);
-                    OneHourAgoJson = fetchedJson.result; // as fallback, use fetchedJson (thus volume_change_1h would be 0 for each ticker)
-                    TwoHourAgoJson = fetchedJson.result; // as fallback, use fetchedJson (thus volume_change_2h would be 0 for each ticker)
-                }
-                 
                 (async () => {
+                    try {
+                        OneHourAgoJson = await util.readJSON(SLUG, {hoursAgo: 1, onlyLast: 1});
+                        
+                    }
+                    catch(e) {
+                        util.throwError('could not find previous bittrex market summaries (1 hour ago); so using just fetched one');
+                        OneHourAgoJson = fetchedJson.result; // as fallback, use fetchedJson (thus volume_change_1h would be 0 for each ticker)
+                    }
+                    
+                    try {
+                        TwoHourAgoJson = await util.readJSON(SLUG, {hoursAgo: 2, onlyLast: 1});
+                    }
+                    catch(e) {
+                         util.throwError('could not find previous bittrex market summaries (2 hours ago); so using just fetched one');
+                         TwoHourAgoJson = fetchedJson.result; // as fallback, use fetchedJson (thus volume_change_2h would be 0 for each ticker)
+                    }
+
                     // add extra calculated properties
                     var calculatedJson = fetchedJson.result.map((ticker) => {
                         ticker.price_change_24h = (1 - (ticker.PrevDay / ticker.Last)) * 100;

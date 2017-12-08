@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "bittrexCronjob.js",
+  "engines": {
+    "node" : "8.9.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "echo \"Hello World \n$(date)\" > helloworld.txt"
+    "start": "node bittrexTsunami BTC"
   },
   "repository": {
     "type": "git",
@@ -23,6 +26,7 @@
     "mailgun-js": "^0.13.1",
     "moment": "^2.19.3",
     "node-cron": "^1.2.1",
+    "node-uuid": "^1.4.8",
     "request": "^2.83.0"
   },
   "devDependencies": {}
