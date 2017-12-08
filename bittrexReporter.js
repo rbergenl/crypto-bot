@@ -115,7 +115,7 @@ if (moment().hours() != 0) {
         bittrexOrders = bittrexOrders.filter(function(order){
             let then = order.datetime;
             let daysAgo = moment.duration(now.diff(then)).days();
-            return daysAgo == 5; // should be 0 (so within last 24 hours)
+            return daysAgo == 0; // should be 0 (so within last 24 hours)
         }).map(function(order){
             return {
                 symbol: order.symbol,
