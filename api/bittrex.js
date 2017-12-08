@@ -105,12 +105,13 @@ module.exports.getBalances = function() {
     });
 };
 
-module.exports.buyOrder = function(symbol, units, price) {
+module.exports.buyOrder = function(id, units, price) {
     return new Promise(function (resolve, reject){
         if(dryRun) {
             resolve({"dryRun":true});
         } else {
             (async () => {
+                let symbol = id.split('-')[1] + '/' + id.split('-')[0]; // transformation needed for ccxt
                 //createOrder (symbol, type, side, amount, price = undefined, params = {})
                 // Bittrex does not allow MarketBuyOrder placed by bots, only limitBuyOrder
                 let json = await bittrexCCXT.createLimitBuyOrder(symbol, units, price);
@@ -120,12 +121,13 @@ module.exports.buyOrder = function(symbol, units, price) {
     });
 };
 
-module.exports.sellOrder = function(symbol, units, price) {
+module.exports.sellOrder = function(id, units, price) {
     return new Promise(function (resolve, reject){
         if(dryRun) {
             resolve({"dryRun":true});
         } else {
             (async () => {
+                let symbol = id.split('-')[1] + '/' + id.split('-')[0]; // transformation needed for ccxt
                 //createOrder (symbol, type, side, amount, price = undefined, params = {})
                 let json = await bittrexCCXT.createLimitSellOrder(symbol, units, price);
                 resolve(json);
@@ -174,7 +176,8 @@ module.exports.cancelOrder = function(id) {
             resolve({"dryRun":true});
         } else {
             (async () => {
-                let json = await bittrexCCXT.cancelOrder(id);
+                let symbol = id.split('-')[1] + '/' + id.split('-')[0]; // transformation needed for ccxt
+                let json = await bittrexCCXT.cancelOrder(symbol);
                 resolve(json);
             })();
         }
@@ -187,7 +190,8 @@ module.exports.fetchOrderBook = function(id) {
             if (local) {
                 resolve(require('../test/bittrex/bittrex-orderbook.json'));
             } else {
-                let json = await bittrexCCXT.fetchOrderBook(id);
+                let symbol = id.split('-')[1] + '/' + id.split('-')[0]; // transformation needed for ccxt
+                let json = await bittrexCCXT.fetchOrderBook(symbol);
                 json.bids = json.bids.slice(0, 250);
                 json.asks = json.asks.slice(0, 250);
                 

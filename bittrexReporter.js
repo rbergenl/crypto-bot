@@ -10,6 +10,11 @@ var doEmail = (process.argv[2] == '--email') ? true : false;
 
 const SLUG = 'bittrexReporter';
 
+if (moment().hours() != 0) {
+    console.log(moment() + ': ' + SLUG + ' not executing since hours at this moment is not 0');
+    process.exit();
+}
+
 (async () => {
     let bittrexMarketSummaries;
     let bittrexBalances;

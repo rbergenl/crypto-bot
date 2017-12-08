@@ -1,3 +1,4 @@
+//THIS IS A COPY FROM ./CCXT_FIX
 "use strict";
 
 //  ---------------------------------------------------------------------------
@@ -411,7 +412,7 @@ module.exports = class bittrex extends Exchange {
         let market = this.market (symbol);
         let method = 'marketGet' + this.capitalize (side) + type;
         let order = {
-            'market': market['id'],
+            'market': /*market['id']*/ market,
             'quantity': this.amountToPrecision (symbol, amount),
         };
         if (type == 'limit')

@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "set_aws": "mkdir -p ~/.aws && echo \"[default]\naws_access_key_id=${AWS_KEY_ID}\naws_secret_access_key=${AWS_SECRET}\" > ~/.aws/credentials",
-    "start": "npm run set_aws && node bittrexTsunami BTC"
+    "fix_ccxt": "cp ./ccxt_fix/bittrex.js ./node_modules/ccxt/js/bittrex.js",
+    "start": "npm run set_aws && node bittrexTsunami BTC && node bittrexReporter --email"
   },
   "repository": {
     "type": "git",
