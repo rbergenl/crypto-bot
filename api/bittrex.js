@@ -132,6 +132,7 @@ module.exports.sellOrder = function(id, units, price) {
             resolve({"dryRun":true});
         } else {
             (async () => {
+                let symbol = id.split('-')[1] + '/' + id.split('-')[0]; // transformation needed for ccxt
                // let symbol = id.split('-')[1] + '/' + id.split('-')[0]; // transformation needed for ccxt
                 //createOrder (symbol, type, side, amount, price = undefined, params = {})
                 let json = await bittrexCCXT.createLimitSellOrder(symbol, units, price);
