@@ -8,6 +8,7 @@ AWS.config.update({region: 'us-east-2'});
 let dynamodb = new AWS.DynamoDB({apiVersion: '2012-10-08'});
 
 module.exports.getAll = function(tableName, fromDatetime, untilDatetime) {
+
     return new Promise(function (resolve, reject){
         var params = {
             TableName: tableName,
@@ -63,6 +64,7 @@ module.exports.save = function(tableName, datetime, data) {
                 reject(err); // an error occurred
             }
             else {
+                console.log(datetime + ": saved to DynamoDB: " + tableName);
                 resolve();// successful response
             }
         });

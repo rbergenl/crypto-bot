@@ -7,3 +7,4 @@ Open a new terminal:
 Package used:
 https://www.npmjs.com/package/ccxt
 https://github.com/ccxt-dev/ccxt/wiki
+https://github.com/mongolab/mongodb-driver-examples/blob/master/nodejs/nodeSimpleExample.js

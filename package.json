@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "set_aws": "mkdir -p ~/.aws && echo \"[default]\naws_access_key_id=${AWS_KEY_ID}\naws_secret_access_key=${AWS_SECRET}\" > ~/.aws/credentials",
     "fix_ccxt": "cp ./ccxt_fix/bittrex.js ./node_modules/ccxt/js/bittrex.js",
-    "start": "npm run set_aws && node bittrexTsunami BTC && node bittrexReporter --email"
+    "start": "node bittrexTsunami BTC && node bittrexReporter --email"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "fs-extra": "4.0.2",
     "mailgun-js": "0.13.1",
     "moment": "2.19.3",
+    "mongodb": "3.0.0-rc0",
     "node-cron": "1.2.1",
     "node-uuid": "1.4.8",
     "request": "2.83.0"

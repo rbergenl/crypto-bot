@@ -2,6 +2,7 @@ var fs = require('fs-extra');
 var path = require('path');
 var moment = require('moment');
 var dynamo = require('../api/dynamo');
+var mlab = require('../api/mlab');
 
 var rootDir = path.join('./log');
 
@@ -27,8 +28,7 @@ module.exports.writeJSON = function(slug, data, options) {
                     resolve();
                 });
             } else {
-                await dynamo.save(slug, dateTimeStamp, data);
-                console.log(dateTimeStamp + ": saved to DynamoDB: " + slug);
+                await mlab.save(slug, dateTimeStamp, data);
                 resolve();
             }
             
@@ -53,7 +53,7 @@ module.exports.readJSON = function(slug, options) {
                 let fromDatetime = moment().subtract(momentAgo.n, momentAgo.t).format('YYYYMMDDHHmm');
                 let untilDatetime = dateTimeStamp;
                 
-                allData = await dynamo.getAll(slug, fromDatetime, untilDatetime);
+                allData = await mlab.getAll(slug, fromDatetime, untilDatetime);
                 
                 // from all return items; take only the last ones
                 if (options.onlyLast > 0) {
