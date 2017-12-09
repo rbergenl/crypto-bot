@@ -43,7 +43,6 @@ module.exports.getMarketsSummaries = function(options = {}) {
                 (async () => {
                     try {
                         OneHourAgoJson = await util.readJSON(SLUG, {hoursAgo: 1, onlyLast: 1});
-                        
                     }
                     catch(e) {
                         util.throwError('could not find previous bittrex market summaries (1 hour ago); so using just fetched one');
@@ -57,26 +56,31 @@ module.exports.getMarketsSummaries = function(options = {}) {
                          util.throwError('could not find previous bittrex market summaries (2 hours ago); so using just fetched one');
                          TwoHourAgoJson = fetchedJson.result; // as fallback, use fetchedJson (thus volume_change_2h would be 0 for each ticker)
                     }
-
+                    
+                    
                     // add extra calculated properties
                     var calculatedJson = fetchedJson.result.map((ticker) => {
                         ticker.price_change_24h = (1 - (ticker.PrevDay / ticker.Last)) * 100;
                         ticker.spread = (1 - (ticker.Bid / ticker.Ask)) * 100;
                         ticker.symbol = ticker.MarketName.split('-')[1];
                         
-                        var prevVolume1h = OneHourAgoJson.find(x => x.MarketName === ticker.MarketName).BaseVolume;
-                        var prevVolume2h = TwoHourAgoJson.find(x => x.MarketName === ticker.MarketName).BaseVolume;
+                        var sameMarket1h = OneHourAgoJson.find(x => x.MarketName === ticker.MarketName);
+                        var sameMarket2h = TwoHourAgoJson.find(x => x.MarketName === ticker.MarketName);
+                         
+                         if(!sameMarket1h) console.log(ticker.MarketName)
+                        var prevVolume1h = sameMarket1h ? sameMarket1h.BaseVolume : ticker.BaseVolume;
+                        var prevVolume2h = sameMarket2h ? sameMarket2h.BaseVolume : ticker.BaseVolume;
                         ticker.volume_change_1h = (1 - (ticker.BaseVolume / prevVolume1h)) * 100;
                         ticker.volume_change_2h = (1 - (ticker.BaseVolume / prevVolume2h)) * 100;
                         
-                        var prevPrice1h = OneHourAgoJson.find(x => x.MarketName === ticker.MarketName).Last;
-                        var prevPrice2h = TwoHourAgoJson.find(x => x.MarketName === ticker.MarketName).Last;
+                        var prevPrice1h = sameMarket1h ? sameMarket1h.Last : ticker.Last;
+                        var prevPrice2h = sameMarket2h ? sameMarket2h.Last : ticker.Last;
                         ticker.price_change_1h = (1 - (ticker.Last / prevPrice1h)) * 100;
                         ticker.price_change_2h = (1 - (ticker.Last / prevPrice2h)) * 100;
                         
                         return ticker;
                     });
-                    
+                
                     if (options.save) await util.writeJSON(SLUG, calculatedJson);
                     
                     resolve(calculatedJson);
