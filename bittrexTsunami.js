@@ -285,6 +285,6 @@ const CANCEL_ORDER_AFTER_MINUTES                            = 360;
     };
     
     await util.writeJSON(SLUG, jsonOut);
-    console.log(jsonOut);
+    console.log(jsonOut); // and write to console for build log
     
 })();

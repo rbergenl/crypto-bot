@@ -95,7 +95,12 @@ if (moment().hours() != 0) {
                 sum += parseFloat(latestReports[i].value_btc_change_24h, 10); //don't forget to add the base
             }
             
-            report.value_btc_change_7d = parseFloat((sum / latestReports.length).toFixed(2));
+            if (latestReports.length > 0) {
+                report.value_btc_change_7d = parseFloat((sum / latestReports.length).toFixed(2));
+            } else {
+                // cannot calculate last 7 days change; so then using last day change instead
+                report.value_btc_change_7d = report.value_btc_change_24h;
+            }
         }
         catch(e) {
             util.throwError(e);
@@ -161,6 +166,7 @@ if (moment().hours() != 0) {
     
     //await util.writeJSON(SLUG, report, {toFile:true});
     await util.writeJSON(SLUG, report);
+    console.log(report);  // and write to console for build log
     
 })();
 

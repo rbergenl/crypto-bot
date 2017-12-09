@@ -14,7 +14,7 @@ module.exports.getText = function(report) {
     
     let currentReport = Object.assign({}, report); // use new object, not the reference (due to making changes to the object)
     
-    if (currentReport.value_btc_change_7d == 0)
+    if (currentReport.value_btc_change_7d == 0 || currentReport.value_btc_change_7d == null)
         currentReport.value_btc_change_7d = 0.01;
     currentReport['value_btc_change_7d_percent'] = 1 + (currentReport.value_btc_change_7d / 100);
 
