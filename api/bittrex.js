@@ -57,7 +57,6 @@ module.exports.getMarketsSummaries = function(options = {}) {
                          TwoHourAgoJson = fetchedJson.result; // as fallback, use fetchedJson (thus volume_change_2h would be 0 for each ticker)
                     }
                     
-                    
                     // add extra calculated properties
                     var calculatedJson = fetchedJson.result.map((ticker) => {
                         ticker.price_change_24h = (1 - (ticker.PrevDay / ticker.Last)) * 100;
@@ -66,7 +65,7 @@ module.exports.getMarketsSummaries = function(options = {}) {
                         
                         var sameMarket1h = OneHourAgoJson.find(x => x.MarketName === ticker.MarketName);
                         var sameMarket2h = TwoHourAgoJson.find(x => x.MarketName === ticker.MarketName);
-                         
+                        
                         var prevVolume1h = sameMarket1h ? sameMarket1h.BaseVolume : ticker.BaseVolume;
                         var prevVolume2h = sameMarket2h ? sameMarket2h.BaseVolume : ticker.BaseVolume;
                         ticker.volume_change_1h = (1 - (ticker.BaseVolume / prevVolume1h)) * 100;
