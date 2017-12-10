@@ -51,6 +51,7 @@ module.exports.readJSON = function(slug, options) {
                 momentAgo = (options.daysAgo == 2) ? {n:2,t:'days'} : momentAgo;
                 
                 let fromDatetime = moment().subtract(momentAgo.n, momentAgo.t).format('YYYYMMDDHHmm');
+
                 let untilDatetime = dateTimeStamp;
                 
                 allData = await mlab.getAll(slug, fromDatetime, untilDatetime);
@@ -60,11 +61,11 @@ module.exports.readJSON = function(slug, options) {
                     allData = allData.slice(Math.max(allData.length - options.onlyLast, 1));
                 }
                 
-                // if only 1 item is desired; then don't return an array
-                if (options.onlyLast == 1) {
+                // if only 1 item is desired; then don't return an array (if length is already bigger than 0)
+                if (options.onlyLast == 1 && allData.length > 0) {
                     allData = allData[0];
                 }
-                
+
                 if (allData != undefined) {
                     //require('./util').writeJSON(slug, allData, {toFile:true});
                     resolve(allData);
@@ -73,7 +74,7 @@ module.exports.readJSON = function(slug, options) {
                 }
             }
             catch(e) {
-                require('./util').throwError('error', e);
+                require('./util').throwError(e);
             }
         })();
     });

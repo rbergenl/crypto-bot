@@ -67,7 +67,6 @@ module.exports.getMarketsSummaries = function(options = {}) {
                         var sameMarket1h = OneHourAgoJson.find(x => x.MarketName === ticker.MarketName);
                         var sameMarket2h = TwoHourAgoJson.find(x => x.MarketName === ticker.MarketName);
                          
-                         if(!sameMarket1h) console.log(ticker.MarketName)
                         var prevVolume1h = sameMarket1h ? sameMarket1h.BaseVolume : ticker.BaseVolume;
                         var prevVolume2h = sameMarket2h ? sameMarket2h.BaseVolume : ticker.BaseVolume;
                         ticker.volume_change_1h = (1 - (ticker.BaseVolume / prevVolume1h)) * 100;
