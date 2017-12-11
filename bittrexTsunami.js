@@ -35,28 +35,15 @@ const CANCEL_ORDER_AFTER_MINUTES                            = 360;
     let calculatedOrders = [];
     let sellOrdersPlaced = [];
    
-   
-   //========== fetch market summaries and open orders
-    try {
-        bittrexMarketSummaries = await bittrexAPI.getMarketsSummaries({save:true});
-        bittrexOpenOrders = await bittrexAPI.getOpenOrders();
-    }
-    catch(e) {
-        util.throwError(e);
-    }   
-        
 
-    //========== First cancel all outstanding/partial buy orders; so that basecurrency is freed up
+
+    //========== First cancel all outstanding sell orders that are overdue; so that basecurrency is freed up
     try {
+        
+        bittrexOpenOrders = await bittrexAPI.getOpenOrders();
 
         for (let order of bittrexOpenOrders) {
-            
-            // if it is a buy order; than just cancel that order (it might be partially filled)
-            if(order.side == 'buy') {
-                await bittrexAPI.cancelOrder(order.id);
-                ordersCancelled.push(order);
-            }
-            
+
             // if it is a sell order open for longer than 6 hours, cancel that order (all other sell orders stay open)
             if(order.side == 'sell') {
                 let now = moment();
@@ -76,8 +63,10 @@ const CANCEL_ORDER_AFTER_MINUTES                            = 360;
         util.throwError(e);
     }
     
-    //========== Select markets
+    //==========  fetch market summaries and select markets
     try {
+        
+        bittrexMarketSummaries = await bittrexAPI.getMarketsSummaries({save:true});
 
         // select only desired tickers
         selectedTickers
@@ -193,17 +182,40 @@ const CANCEL_ORDER_AFTER_MINUTES                            = 360;
     }
     
     
+    //================== Now cancel if buy order is still open
+    
+    // wait 10 seconds for the buy order to be processed; then cancel open standing buy orders
+    console.log('sleeping 10 seconds before executing api calls');
+    child_process.execSync('sleep 10');
+    
+    try {
         
+        bittrexOpenOrders = await bittrexAPI.getOpenOrders();
+
+        for (let order of bittrexOpenOrders) {
+            
+            // if it is a buy order; than just cancel that order (it might be partially filled)
+            if(order.side == 'buy') {
+                await bittrexAPI.cancelOrder(order.id);
+                ordersCancelled.push(order);
+            }
+        }
+    }
+    catch(e) {
+        util.throwError(e);
+    }
+    
+     // wait 2 seconds for the buy order to be processed; then place the sell order
+    console.log('sleeping 2 seconds before executing api calls');
+    child_process.execSync('sleep 2');
+    
+            
     //========== Check how much balance is available of each coin/token
     try {
 
         // place the sell order for the 
         for (let market of oneSelectedTicker) {
-            
-            // wait 30 seconds for the buy order to be processed; then place the sell order
-            console.log('sleeping 10 seconds before executing api calls');
-            child_process.execSync('sleep 10');
-            
+
             // get fresh new updated balances
             bittrexBalances = await bittrexAPI.getBalances();
         
@@ -238,7 +250,7 @@ const CANCEL_ORDER_AFTER_MINUTES                            = 360;
     }    
     
 
-    //========== For all the balance that is then still free; sell it for bid price
+    //========== For all the balance that is then still free; sell it for bid price (might be from 6 hours old sell order; possible loss)
     try {
          // get fresh new updated balances
         bittrexBalances = await bittrexAPI.getBalances();
