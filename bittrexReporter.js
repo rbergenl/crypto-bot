@@ -74,10 +74,12 @@ if (moment().hours() != 0) {
         report['value_btc_change_24h'] = 0;
         
         try {
-            let previousReport = await util.readJSON(SLUG, {daysAgo: 1, onlyLast:1});
-            
+            // fetch from 2 days ago and use only last one, otherwise 1 day ago might be missed getting fetched by a minute..
+            let previousReport = await util.readJSON(SLUG, {daysAgo: 2, onlyLast:1});
+
             report.value_btc_change_24h = (1 - (previousReport.value_btc / report.value_btc));
-            report.value_btc_change_24h =  parseFloat((report.value_btc_change_24h).toFixed(2));
+            report.value_btc_change_24h =  parseFloat((report.value_btc_change_24h).toFixed(3));
+           
         }
         catch(e) {
             util.throwError('report from one day ago does not exist, cannot compare, so value_btc_change_24h will be 0');
@@ -96,7 +98,7 @@ if (moment().hours() != 0) {
             }
             
             if (latestReports.length > 0) {
-                report.value_btc_change_7d = parseFloat((sum / latestReports.length).toFixed(2));
+                report.value_btc_change_7d = parseFloat((sum / latestReports.length).toFixed(3));
             } else {
                 // cannot calculate last 7 days change; so then using last day change instead
                 report.value_btc_change_7d = report.value_btc_change_24h;
@@ -127,6 +129,7 @@ if (moment().hours() != 0) {
                 side: order.side,
                 status: order.status,
                 filled: order.filled,
+                price: order.price,
                 time: moment(order.timestamp).format('hh:mm:ss')
             };
         });
@@ -166,7 +169,7 @@ if (moment().hours() != 0) {
     
     //await util.writeJSON(SLUG, report, {toFile:true});
     await util.writeJSON(SLUG, report);
-    console.log(report);  // and write to console for build log
+   // console.log(report);  // and write to console for build log
     
 })();
 

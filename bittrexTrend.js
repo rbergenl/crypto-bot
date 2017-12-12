@@ -40,7 +40,7 @@ function currentPortfolio(currentReport) {
     
 `;
     for(let order of currentReport.orders) {
-        msg += `${order.time} - ${order.symbol} - ${order.side} - ${order.status} - ${order.filled}\n`;
+        msg += `${order.time} - ${order.symbol} - ${order.side} - ${order.status} - ${order.filled} * ${order.price} = ${parseFloat((order.filled*order.price).toFixed(8))}\n`;
     }
 return msg + '\n';
 
