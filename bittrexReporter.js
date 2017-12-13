@@ -18,7 +18,6 @@ if (moment().hours() != 0) {
 (async () => {
     let bittrexMarketSummaries;
     let bittrexBalances;
-    let bittrexOrders;
     let report = {};
     
     try {
@@ -115,26 +114,51 @@ if (moment().hours() != 0) {
     
     
     try {
-        bittrexOrders = await bittrexAPI.getOrders();
+       // bittrexOrders = await bittrexAPI.getOrders();
+       // get the bittrexTsunami logs from last 24h
+        let bittrexTsunami = await util.readJSON('bittrexTsunami_BTC', {daysAgo: 1});
+        report['orders'] = [];
         
         // only orders from past 24h
-        let now = moment();
-        bittrexOrders = bittrexOrders.filter(function(order){
-            let then = order.datetime;
-            let daysAgo = moment.duration(now.diff(then)).days();
-            return daysAgo == 0; // should be 0 (so within last 24 hours)
-        }).map(function(order){
-            return {
-                symbol: order.symbol,
-                side: order.side,
-                status: order.status,
-                filled: order.filled,
-                price: order.price,
-                time: moment(order.timestamp).format('hh:mm:ss')
-            };
-        });
-        
-        report['orders'] = bittrexOrders;
+        for (let previousReport of bittrexTsunami) {
+            console.log(report)
+            for (let cancelled of previousReport.ordersCancelled) {
+                report.orders.push({
+                    symbol: '',
+                    side:'cancelled',
+                    filled: '',
+                    price: '',
+                    time: ''
+                });
+            }
+            
+            for (let bought of previousReport.buyOrdersPlaced) {
+                report.orders.push({
+                    symbol: previousReport.buyOrders[0].market,
+                    side: 'buy',
+                    filled: previousReport.buyOrders[0].units,
+                    price: previousReport.buyOrders[0].price,
+                    h24: previousReport.selectedTickers[0].price_change_24h.toFixed(2),
+                    h2: previousReport.selectedTickers[0].price_change_2h.toFixed(2),
+                    h1: previousReport.selectedTickers[0].price_change_1h.toFixed(2),
+                    v2: previousReport.selectedTickers[0].volume_change_2h.toFixed(2),
+                    v1: previousReport.selectedTickers[0].volume_change_1h.toFixed(2),
+                    tsunami: previousReport.selectedTickers[0].bidsTsunamiScore,
+                    time: moment(previousReport.selectedTickers[0].TimeStamp).format('HH:mm:ss')
+                });
+            }
+            
+            for (let sold of previousReport.sellOrdersPlaced) {
+                report.orders.push({
+                    symbol: previousReport.calculatedOrders[0].marketName,
+                    side: 'sell',
+                    filled: previousReport.calculatedOrders[0].units,
+                    price:  previousReport.calculatedOrders[0].targetPrice,
+                    time: moment(previousReport.selectedTickers[0].TimeStamp).format('HH:mm:ss')
+                });
+            }
+        }
+
     }
     catch(e) {
         util.throwError(e);
@@ -167,7 +191,7 @@ if (moment().hours() != 0) {
         util.throwError(e);
     }
     
-    //await util.writeJSON(SLUG, report, {toFile:true});
+    // await util.writeJSON(SLUG, report, {toFile:true});
     await util.writeJSON(SLUG, report);
    // console.log(report);  // and write to console for build log
     

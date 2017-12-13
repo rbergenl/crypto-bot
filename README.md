@@ -11,4 +11,3 @@ https://github.com/mongolab/mongodb-driver-examples/blob/master/nodejs/nodeSimpl
 
 #TODO
 - cancel order:  bittrex {"success":false,"message":"INVALID_SIGNATURE","result":null}
-- trend: add 24h, 2h, 1h, 2v, 1v and tsunami to orders.

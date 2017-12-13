@@ -1,0 +1,175 @@
+{
+    "_id": {
+        "$oid": "5a307e1120400a008e35933f"
+    },
+    "datetime": "201712130110",
+    "data": {
+        "selectedTickers": [
+            {
+                "MarketName": "BTC-MAID",
+                "High": 0.0000432,
+                "Low": 0.000028,
+                "Volume": 4639133.53307472,
+                "Last": 0.00003268,
+                "BaseVolume": 155.39475608,
+                "TimeStamp": "2017-12-13T01:10:13.29",
+                "Bid": 0.00003267,
+                "Ask": 0.00003268,
+                "OpenBuyOrders": 208,
+                "OpenSellOrders": 2719,
+                "PrevDay": 0.00002912,
+                "Created": "2016-01-18T20:38:22.707",
+                "price_change_24h": 10.89351285189718,
+                "spread": 0.03059975520196545,
+                "symbol": "MAID",
+                "volume_change_1h": 2.1942987690522497,
+                "volume_change_2h": 2.1942987690522497,
+                "price_change_1h": 0.33546813052761637,
+                "price_change_2h": 0.33546813052761637,
+                "bidsTsunamiScore": 3.37
+            },
+            {
+                "MarketName": "BTC-MANA",
+                "High": 0.00000569,
+                "Low": 0.00000438,
+                "Volume": 181666115.13856837,
+                "Last": 0.00000494,
+                "BaseVolume": 896.090406,
+                "TimeStamp": "2017-12-13T01:10:11.51",
+                "Bid": 0.00000492,
+                "Ask": 0.00000493,
+                "OpenBuyOrders": 1180,
+                "OpenSellOrders": 4121,
+                "PrevDay": 0.00000478,
+                "Created": "2017-10-13T23:32:02.993",
+                "price_change_24h": 3.238866396761142,
+                "spread": 0.20283975659228792,
+                "symbol": "MANA",
+                "volume_change_1h": 5.084145470590162,
+                "volume_change_2h": 5.084145470590162,
+                "price_change_1h": 0.6036217303822866,
+                "price_change_2h": 0.6036217303822866,
+                "bidsTsunamiScore": 0.85
+            },
+            {
+                "MarketName": "BTC-SNT",
+                "High": 0.00000378,
+                "Low": 0.00000348,
+                "Volume": 73763039.98401812,
+                "Last": 0.00000367,
+                "BaseVolume": 268.35119569,
+                "TimeStamp": "2017-12-13T01:10:13.417",
+                "Bid": 0.00000367,
+                "Ask": 0.00000368,
+                "OpenBuyOrders": 573,
+                "OpenSellOrders": 5488,
+                "PrevDay": 0.00000364,
+                "Created": "2017-06-28T18:26:15.73",
+                "price_change_24h": 0.8174386920980936,
+                "spread": 0.27173913043477826,
+                "symbol": "SNT",
+                "volume_change_1h": 4.016068977043186,
+                "volume_change_2h": 4.016068977043186,
+                "price_change_1h": 1.0781671159029615,
+                "price_change_2h": 1.0781671159029615,
+                "bidsTsunamiScore": 0.77
+            },
+            {
+                "MarketName": "BTC-PTOY",
+                "High": 0.00003375,
+                "Low": 0.0000162,
+                "Volume": 157203683.41196164,
+                "Last": 0.00002695,
+                "BaseVolume": 3781.50314424,
+                "TimeStamp": "2017-12-13T01:10:13.777",
+                "Bid": 0.000027,
+                "Ask": 0.00002738,
+                "OpenBuyOrders": 966,
+                "OpenSellOrders": 2866,
+                "PrevDay": 0.00001954,
+                "Created": "2017-06-18T17:04:24.1",
+                "price_change_24h": 27.495361781076078,
+                "spread": 1.3878743608473298,
+                "symbol": "PTOY",
+                "volume_change_1h": 2.217283788112323,
+                "volume_change_2h": 2.217283788112323,
+                "price_change_1h": 5.83508036338225,
+                "price_change_2h": 5.83508036338225,
+                "bidsTsunamiScore": 0.33
+            },
+            {
+                "MarketName": "BTC-ARDR",
+                "High": 0.00006666,
+                "Low": 0.0000389,
+                "Volume": 32478987.32309226,
+                "Last": 0.00005712,
+                "BaseVolume": 1716.94110129,
+                "TimeStamp": "2017-12-13T01:10:12.557",
+                "Bid": 0.0000571,
+                "Ask": 0.00005712,
+                "OpenBuyOrders": 1307,
+                "OpenSellOrders": 1800,
+                "PrevDay": 0.00004215,
+                "Created": "2016-10-13T18:59:37.407",
+                "price_change_24h": 26.207983193277308,
+                "spread": 0.035014005602251874,
+                "symbol": "ARDR",
+                "volume_change_1h": 8.393129136161493,
+                "volume_change_2h": 8.393129136161493,
+                "price_change_1h": 1.1422637590861817,
+                "price_change_2h": 1.1422637590861817,
+                "bidsTsunamiScore": 0.18
+            }
+        ],
+        "ordersCancelled": [{
+            "info": {
+                "success": true,
+                "message": "",
+                "result": {
+                    "uuid": "5dbc243e-7d97-4947-9100-c0f833a2cfa7"
+                }
+            },
+            "id": "5dbc243e-7d97-4947-9100-c0f833a2cfa7"
+        }],
+        "buyOrders": [
+            {
+                "market": "BTC-MAID",
+                "ticker": "MAID",
+                "price": 0.00003268,
+                "allocated_BTC": 0.0066669500000000005,
+                "units": 204.00703794369647
+            }
+        ],
+        "buyOrdersPlaced": [
+            {
+                "info": {
+                    "success": true,
+                    "message": "",
+                    "result": {
+                        "uuid": "5dbc243e-7d97-4947-9100-c0f833a2cfa7"
+                    }
+                },
+                "id": "5dbc243e-7d97-4947-9100-c0f833a2cfa7"
+            }
+        ],
+        "calculatedOrders": [
+            {
+                "marketName": "BTC-MAID",
+                "units": 204.00703794,
+                "targetPrice": 0.00003309
+            }
+        ],
+        "sellOrdersPlaced": [
+            {
+                "info": {
+                    "success": true,
+                    "message": "",
+                    "result": {
+                        "uuid": "7db2a62f-2b96-4247-a54b-306ca7300e16"
+                    }
+                },
+                "id": "7db2a62f-2b96-4247-a54b-306ca7300e16"
+            }
+        ]
+    }
+}
