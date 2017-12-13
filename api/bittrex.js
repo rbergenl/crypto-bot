@@ -118,7 +118,7 @@ module.exports.buyOrder = function(market, units, price) {
                 //createOrder (symbol, type, side, amount, price = undefined, params = {})
                 // Bittrex does not allow MarketBuyOrder placed by bots, only limitBuyOrder
                 try {
-                    console.log(`placing order: ${symbol} ${units} * ${price}`);
+                    console.log(`placing buy order: ${symbol} ${units} * ${price}`);
                     let json = await bittrexCCXT.createLimitBuyOrder(symbol, units, price);
                     resolve(json);
                 }
@@ -154,8 +154,14 @@ module.exports.sellOrder = function(market, units, price) {
                 let symbol = market.split('-')[1] + '/' + market.split('-')[0]; // transformation needed for ccxt
                // let symbol = id.split('-')[1] + '/' + id.split('-')[0]; // transformation needed for ccxt
                 //createOrder (symbol, type, side, amount, price = undefined, params = {})
-                let json = await bittrexCCXT.createLimitSellOrder(symbol, units, price);
-                resolve(json);
+                try {
+                    console.log(`placing sell order: ${symbol} ${units} * ${price}`);
+                    let json = await bittrexCCXT.createLimitSellOrder(symbol, units, price);
+                    resolve(json);
+                }
+                catch(e) {
+                    reject(e);
+                }
             })();
         }
     });
