@@ -50,6 +50,7 @@ const CANCEL_ORDER_AFTER_MINUTES                            = 360;
                 let then = order.datetime;
                 let minutesAgo = moment.duration(now.diff(then)).minutes();
                 
+                console.log(`Sell order ${order.symbol} is open for ${minutesAgo} out of maximum ${CANCEL_ORDER_AFTER_MINUTES}`);
                 if (minutesAgo > CANCEL_ORDER_AFTER_MINUTES) {
                     await bittrexAPI.cancelOrder(order.id);
                     ordersCancelled.push(order);
@@ -103,7 +104,7 @@ const CANCEL_ORDER_AFTER_MINUTES                            = 360;
         let orderBook;
         for (let market of selectedTickers) {
             // wait 5 second before executing each batch of api calls
-            console.log('sleeping 2 seconds before executing api call fetchOrderBook (' + market.MarketName + '): ' + tickersToGo + 'x to go.');
+            console.log('sleeping 2 seconds before executing api call: ' + tickersToGo + 'x to go.');
             child_process.execSync('sleep 2');
             
             // check orderbook
@@ -288,8 +289,8 @@ const CANCEL_ORDER_AFTER_MINUTES                            = 360;
     }
 
     let jsonOut = {
-        ordersCancelled: ordersCancelled,
         selectedTickers: selectedTickers,
+        ordersCancelled: ordersCancelled,
         buyOrders: buyOrders,
         buyOrdersPlaced: buyOrdersPlaced,
         calculatedOrders: calculatedOrders,

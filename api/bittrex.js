@@ -214,14 +214,33 @@ module.exports.cancelOrder = function(orderId) {
     });
 };
 
-module.exports.fetchOrderBook = function(id) {
+module.exports.fetchOrderBook = function(market) {
     return new Promise(function (resolve, reject){
         (async () => {
             if (local) {
                 resolve(require('../test/bittrex/bittrex-orderbook.json'));
             } else {
-                let symbol = id.split('-')[1] + '/' + id.split('-')[0]; // transformation needed for ccxt
-                let json = await bittrexCCXT.fetchOrderBook(symbol);
+                let json;
+                
+                try {
+                    let symbol = market.split('-')[1] + '/' + market.split('-')[0]; // transformation needed for ccxt
+                    console.log(`fetching orderbook for: ${symbol}`);
+                    json = await bittrexCCXT.fetchOrderBook(symbol);
+                }
+                catch (e) {
+                    if (e.includes('does not have market symbol')) {
+                        try {
+                            // try again with original market symbol
+                            console.log(`fetchin orderbook for: ${market} (try again)`);
+                            json = await bittrexCCXT.fetchOrderBook(market);
+                        }
+                        catch (e) {
+                            reject(e);
+                        }
+                    } else {
+                        reject(e);
+                    }
+                }
                 json.bids = json.bids.slice(0, 250);
                 json.asks = json.asks.slice(0, 250);
                 
