@@ -17,7 +17,7 @@ const LEAVE_BACKUP_FOR_HIGHER_ACTUAL_RATE                   = 0.0001;
 const FEE_PERCENTAGE                                        = 0.0025; // fee = actual price * percentage (paid = 10 units * 1 eth + (1 * 0.0025))
 const TARGET_PERCENT                                        = 1.0125; // +1.25%
 const MIN_TSUNAMI_SCORE                                     = 2;
-const CANCEL_ORDER_AFTER_MINUTES                            = 360;
+const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) * 2; // milliseconds in an hour, times 2 hours
 
 (async () => {
 
@@ -47,11 +47,12 @@ const CANCEL_ORDER_AFTER_MINUTES                            = 360;
             // if it is a sell order open for longer than 6 hours, cancel that order (all other sell orders stay open)
             if(order.side == 'sell') {
                 let now = moment();
-                let then = order.datetime;
-                let minutesAgo = moment.duration(now.diff(then)).minutes();
+                let then = moment(order.datetime);
+
+                let millisecondsAgo = now.diff(then);
                 
-                console.log(`Sell order ${order.symbol} is open for ${minutesAgo} out of maximum ${CANCEL_ORDER_AFTER_MINUTES}`);
-                if (minutesAgo > CANCEL_ORDER_AFTER_MINUTES) {
+                console.log(`Sell order ${order.symbol} is open for ${millisecondsAgo} out of maximum ${CANCEL_ORDER_AFTER_MILLISECONDS}`);
+                if (millisecondsAgo > CANCEL_ORDER_AFTER_MILLISECONDS) {
                     await bittrexAPI.cancelOrder(order.id);
                     ordersCancelled.push(order);
                 }

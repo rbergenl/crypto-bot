@@ -208,6 +208,7 @@ module.exports.cancelOrder = function(orderId) {
         } else {
             (async () => {
                 let json = await bittrexCCXT.cancelOrder(orderId);
+                console.log('order cancelled: ' + json);
                 resolve(json);
             })();
         }

@@ -9,6 +9,6 @@ https://www.npmjs.com/package/ccxt
 https://github.com/ccxt-dev/ccxt/wiki
 https://github.com/mongolab/mongodb-driver-examples/blob/master/nodejs/nodeSimpleExample.js
 
-# TODO
-- UnhandledPromiseRejectionWarning: Unhandled promise rejection (rejection id: 2): Error: bittrex does not have market symbol BCC/BTC
-- UnhandledPromiseRejectionWarning: Unhandled promise rejection (rejection id: 1): Error: bittrex {"success":false,"message":"INSUFFICIENT_FUNDS","result":null}
+#TODO
+- cancel order:  bittrex {"success":false,"message":"INVALID_SIGNATURE","result":null}
+- trend: add 24h, 2h, 1h, 2v, 1v and tsunami to orders.
