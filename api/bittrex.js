@@ -117,8 +117,29 @@ module.exports.buyOrder = function(market, units, price) {
                 let symbol = market.split('-')[1] + '/' + market.split('-')[0]; // transformation needed for ccxt
                 //createOrder (symbol, type, side, amount, price = undefined, params = {})
                 // Bittrex does not allow MarketBuyOrder placed by bots, only limitBuyOrder
-                let json = await bittrexCCXT.createLimitBuyOrder(symbol, units, price);
-                resolve(json);
+                try {
+                    console.log(`placing order: ${symbol} ${units} * ${price}`);
+                    let json = await bittrexCCXT.createLimitBuyOrder(symbol, units, price);
+                    resolve(json);
+                }
+                catch (e) {
+                    if (e.includes('does not have market symbol')) {
+                        try {
+                            // try again with original market symbol
+                            console.log(`placing order (try again), but now for: ${symbol} ${units} * ${price}`);
+                            let json = await bittrexCCXT.createLimitBuyOrder(market, units, price);
+                            resolve(json);
+                        }
+                        catch(e) {
+                            reject(e);
+                        }
+                    }
+                    if (e.includes('INSUFFICIENT_FUNDS')) {
+                        console.log('error handled due to INSUFFICIENT_FUNDS');
+                        reject(e);
+                    }
+                }
+                
             })();
         }
     });

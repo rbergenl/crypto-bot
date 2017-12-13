@@ -103,7 +103,7 @@ const CANCEL_ORDER_AFTER_MINUTES                            = 360;
         let orderBook;
         for (let market of selectedTickers) {
             // wait 5 second before executing each batch of api calls
-            console.log('sleeping 2 seconds before executing api calls: ' + tickersToGo + 'x to go.');
+            console.log('sleeping 2 seconds before executing api call fetchOrderBook (' + market.MarketName + '): ' + tickersToGo + 'x to go.');
             child_process.execSync('sleep 2');
             
             // check orderbook
@@ -143,8 +143,8 @@ const CANCEL_ORDER_AFTER_MINUTES                            = 360;
             // check available balances
             bittrexBalances = await bittrexAPI.getBalances();
             
-            // there is just one chosen ticker (with most volume); give that one the half of available balance; keep a bit for next ticker hour later (and spread risk; not all in a possible loss)
-            let eachShare = ((bittrexBalances[BASE_CURRENCY].free - LEAVE_BACKUP_FOR_HIGHER_ACTUAL_RATE) / 2).toFixed(8);
+            // there is just one chosen ticker (with most volume); give that one 70% of available balance; keep a bit for next ticker hour later (and spread risk; not all in a possible loss)
+            let eachShare = ((bittrexBalances[BASE_CURRENCY].free - LEAVE_BACKUP_FOR_HIGHER_ACTUAL_RATE) / 1.4).toFixed(8);
             // below is share for no matter how many choosenTickers; and the division is going wrong I guess ( / 4, / 3, /2,.. is not fair)
             //let eachShare = ((bittrexBalances[BASE_CURRENCY].free - LEAVE_BACKUP_FOR_HIGHER_ACTUAL_RATE) / tickersToGo).toFixed(8);
             eachShare -= (eachShare * FEE_PERCENTAGE).toFixed(8);
