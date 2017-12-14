@@ -79,8 +79,8 @@ module.exports.getMarketsSummaries = function(options = {}) {
                         return ticker;
                     });
                 
-                    if (options.save) await util.writeJSON(SLUG, calculatedJson);
-                    
+                //    if (options.save) await util.writeJSON(SLUG, calculatedJson);
+                    console.log(calculatedJson)
                     resolve(calculatedJson);
                 })();
               }

@@ -56,14 +56,14 @@ module.exports.readJSON = function(slug, options) {
                 
                 allData = await mlab.getAll(slug, fromDatetime, untilDatetime);
 
-                // from all return items; take only the last ones (if the array is bigger than 1, otherwise it will slice to 0)
-                if (allData.length > 1 && options.onlyLast > 0) {
-                    allData = allData.slice(Math.max(allData.length - options.onlyLast, 1));
-                }
-
                 // if only 1 item is desired; then don't return an array
-                if (options.onlyLast == 1) {
+                if (allData.length > 0 && options.onlyLast == 1) {
                     allData = allData[0];
+                }
+                
+                // from all return items; take only the last ones (if the array is bigger than 1, otherwise it will slice to 0)
+                if (allData.length > 0 && options.onlyLast > 1) {
+                    allData = allData.slice(Math.max(allData.length - options.onlyLast, 1));
                 }
 
                 if (allData != undefined) {
