@@ -59,7 +59,46 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
 
             }
         }
+        
 
+    }
+    catch(e) {
+        util.throwError(e);
+    }
+    
+    
+    //========== For all the balance that is then still free; sell it for bid price (might be from 2 hours old sell order; possible loss)
+    try {
+        // get fresh new updated balances
+        bittrexBalances = await bittrexAPI.getBalances();
+        
+        // get only the balance for the specific market (BCC was only avaiable in the info array... they dont keep updated)
+        let freeBalances = bittrexBalances.info.filter(function(ticker){
+            return ticker.Available > 0;
+        });
+        
+        for (let free of freeBalances) {
+           
+             // only sell if the currency is not ETH and BTC and USDT
+            if (free.Currency != 'ETH' && free.Currency != 'BTC' && free.Currency != 'USDT') {
+                let market = bittrexMarketSummaries.filter(function(market){
+                    return market.MarketName.split('-')[0] == BASE_CURRENCY // Select basecurrency markets only
+                        && market.MarketName.split('-')[1] == free.Currency;
+                });
+
+                let order = {
+                    marketName: market[0].MarketName,
+                    units: free.Available,
+                    targetPrice: parseFloat((market[0].Bid).toFixed(8))
+                };
+                calculatedOrders.push(order);
+    
+                // place the sell order with the free amount, for the desired target price
+                let log = await bittrexAPI.sellOrder(order.marketName, order.units, order.targetPrice);
+                sellOrdersPlaced.push(log);
+            }
+        }
+        
     }
     catch(e) {
         util.throwError(e);
@@ -244,50 +283,14 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
                 // place the sell order with the free amount, for the desired target price
                 let log = await bittrexAPI.sellOrder(order.marketName, order.units, order.targetPrice);
                 sellOrdersPlaced.push(log);
+            } else {
+                console.log(`want to place sell order; but available balance for ${market.symbol} was found to be 0`);
             }
         }
     }
     catch(e) {
         util.throwError(e);
     }    
-    
-
-    //========== For all the balance that is then still free; sell it for bid price (might be from 6 hours old sell order; possible loss)
-    try {
-         // get fresh new updated balances
-        bittrexBalances = await bittrexAPI.getBalances();
-        
-        // get only the balance for the specific market (BCC was only avaiable in the info array... they dont keep updated)
-        let freeBalances = bittrexBalances.info.filter(function(ticker){
-            return ticker.Available > 0;
-        });
-        
-        for (let free of freeBalances) {
-           
-             // only sell if the currency is not ETH and BTC and USDT
-            if (free.Currency != 'ETH' && free.Currency != 'BTC' && free.Currency != 'USDT') {
-                let market = bittrexMarketSummaries.filter(function(market){
-                    return market.MarketName.split('-')[0] == BASE_CURRENCY // Select basecurrency markets only
-                        && market.MarketName.split('-')[1] == free.Currency;
-                });
-
-                let order = {
-                    marketName: market[0].MarketName,
-                    units: free.Available,
-                    targetPrice: parseFloat((market[0].Bid).toFixed(8))
-                };
-                calculatedOrders.push(order);
-    
-                // place the sell order with the free amount, for the desired target price
-                let log = await bittrexAPI.sellOrder(order.marketName, order.units, order.targetPrice);
-                sellOrdersPlaced.push(log);
-            }
-        }
-        
-    }
-    catch(e) {
-        util.throwError(e);
-    }
 
     let jsonOut = {
         selectedTickers: selectedTickers,
