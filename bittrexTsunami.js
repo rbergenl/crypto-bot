@@ -66,7 +66,7 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
         util.throwError(e);
     }
     
-    
+    /*
     //========== For all the balance that is then still free; sell it for bid price (might be from 2 hours old sell order; possible loss)
     try {
         // get fresh new updated balances
@@ -103,6 +103,7 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
     catch(e) {
         util.throwError(e);
     }
+    */
     
     //==========  fetch market summaries and select markets
     try {
