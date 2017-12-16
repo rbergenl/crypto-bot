@@ -1,3 +1,5 @@
+var child_process = require('child_process');
+
 var request = require('request');
 var ccxt = require ('ccxt');
 
@@ -98,7 +100,9 @@ module.exports.getBalances = function() {
             if (local) {
                 resolve(require('../test/bittrex/bittrex-balances.json'));
             } else {
-                
+                // wait 1 seconds
+                console.log('sleeping 1 second before executing api call (getBalances)');
+                child_process.execSync('sleep 1');            
                 //let bittrexMarkets          = await bittrexCCXT.loadMarkets()
                 let json = await bittrexCCXT.fetchBalance();
                 //await util.writeJSON(SLUG, json);
@@ -114,11 +118,14 @@ module.exports.buyOrder = function(market, units, price) {
             resolve({"dryRun":true});
         } else {
             (async () => {
+                // wait 5 second before executing each batch of api calls
+                console.log(`sleeping 1 seconds before executing api call: ${market} ${units} * ${price} (buyOrder).`);
+                child_process.execSync('sleep 1');
+
                 let symbol = market.split('-')[1] + '/' + market.split('-')[0]; // transformation needed for ccxt
                 //createOrder (symbol, type, side, amount, price = undefined, params = {})
                 // Bittrex does not allow MarketBuyOrder placed by bots, only limitBuyOrder
                 try {
-                    console.log(`placing buy order: ${symbol} ${units} * ${price}`);
                     let json = await bittrexCCXT.createLimitBuyOrder(symbol, units, price);
                     resolve(json);
                 }
@@ -222,7 +229,10 @@ module.exports.fetchOrderBook = function(market) {
                 resolve(require('../test/bittrex/bittrex-orderbook.json'));
             } else {
                 let json;
-                
+                // wait 5 second before executing each batch of api calls
+                console.log('sleeping 2 seconds before executing api call: ' + market + ' (fetchOrderBook).');
+                child_process.execSync('sleep 2');
+            
                 try {
                     let symbol = market.split('-')[1] + '/' + market.split('-')[0]; // transformation needed for ccxt
                     console.log(`fetching orderbook for: ${symbol}`);

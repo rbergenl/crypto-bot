@@ -17,7 +17,7 @@ const LEAVE_BACKUP_FOR_HIGHER_ACTUAL_RATE                   = 0.0001;
 const FEE_PERCENTAGE                                        = 0.0025; // fee = actual price * percentage (paid = 10 units * 1 eth + (1 * 0.0025))
 const TARGET_PERCENT                                        = 1.0125; // +1.25%
 const MIN_TSUNAMI_SCORE                                     = 2;
-const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) * 2; // milliseconds in an hour, times 2 hours
+const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) * 4; // milliseconds in an hour, times 4 hours
 
 (async () => {
 
@@ -140,19 +140,14 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
     // from the chosen ones; check order by biggest tsunami
     try {
         
-        let tickersToGo = selectedTickers.length;
         let index = 0;
         let orderBook;
         for (let market of selectedTickers) {
-            // wait 5 second before executing each batch of api calls
-            console.log('sleeping 2 seconds before executing api call: ' + tickersToGo + 'x to go.');
-            child_process.execSync('sleep 2');
-            
+
             // check orderbook
             orderBook = await bittrexAPI.fetchOrderBook(market.MarketName);
             
             selectedTickers[index].bidsTsunamiScore = orderBook.bidsTsunamiScore;
-            tickersToGo--;
             index++;
         }
 
@@ -176,11 +171,7 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
     //================== Now create the buy orders based on available balance
     try {
 
-        let tickersToGo = oneSelectedTicker.length;
         for (let market of oneSelectedTicker) {
-            // wait 5 second before executing each batch of api calls
-            console.log('sleeping 2 seconds before executing api calls: ' + tickersToGo + 'x to go.');
-            child_process.execSync('sleep 2');
             
             // check available balances
             bittrexBalances = await bittrexAPI.getBalances();
@@ -190,8 +181,7 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
             // below is share for no matter how many choosenTickers; and the division is going wrong I guess ( / 4, / 3, /2,.. is not fair)
             //let eachShare = ((bittrexBalances[BASE_CURRENCY].free - LEAVE_BACKUP_FOR_HIGHER_ACTUAL_RATE) / tickersToGo).toFixed(8);
             eachShare -= (eachShare * FEE_PERCENTAGE).toFixed(8);
-            tickersToGo--;
-            
+
             // guard conditions
             if (bittrexBalances[BASE_CURRENCY].free == 0) {
                 buyOrders.push({"msg": BASE_CURRENCY + ' balance is 0'});
@@ -246,12 +236,7 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
     catch(e) {
         util.throwError(e);
     }
-    
-     // wait 2 seconds for the buy order to be processed; then place the sell order
-    console.log('sleeping 2 seconds before executing api calls');
-    child_process.execSync('sleep 2');
-    
-            
+
     //========== Sell the available balance of the just bought coin
     try {
 
