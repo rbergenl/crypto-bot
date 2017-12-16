@@ -123,12 +123,13 @@ if (moment().hours() != 0) {
         for (let previousReport of bittrexTsunami) {
             console.log(report)
             for (let cancelled of previousReport.ordersCancelled) {
+                let cancelledOrder = await bittrexAPI.getOrder(cancelled.id)
                 report.orders.push({
-                    symbol: '',
+                    symbol: cancelledOrder.symbol,
                     side:'cancelled',
-                    filled: '',
-                    price: '',
-                    time: ''
+                    filled: cancelledOrder.filled,
+                    price: cancelledOrder.price,
+                    time: moment(cancelledOrder.datetime).format('HH:mm:ss')
                 });
             }
             

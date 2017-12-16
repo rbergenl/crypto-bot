@@ -174,6 +174,25 @@ module.exports.sellOrder = function(market, units, price) {
     });
 };
 
+
+module.exports.getOrder = function(id) {
+    
+    const SLUG = 'bittrex_order';
+  
+    return new Promise(function (resolve, reject){
+        (async () => {
+            if (local) {
+                resolve(require('../test/bittrex/bittrex-orders.json'))[0];
+            } else {
+                let json = await bittrexCCXT.fetchOrder(id);
+               // await util.writeJSON(SLUG, json);
+                resolve(json);
+            }
+        })();
+    });
+};
+
+
 module.exports.getOrders = function() {
     
     const SLUG = 'bittrex_orders';
