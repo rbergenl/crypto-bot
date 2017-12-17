@@ -144,6 +144,7 @@ if (moment().hours() != 0) {
                     v2: previousReport.selectedTickers[0].volume_change_2h.toFixed(2),
                     v1: previousReport.selectedTickers[0].volume_change_1h.toFixed(2),
                     tsunami: previousReport.selectedTickers[0].bidsTsunamiScore,
+                    basevolume: previousReport.selectedTickers[0].BaseVolume,
                     time: moment(previousReport.selectedTickers[0].TimeStamp).format('HH:mm:ss')
                 });
             }

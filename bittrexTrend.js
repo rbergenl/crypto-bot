@@ -47,7 +47,8 @@ function currentPortfolio(currentReport) {
             h1: ${order.h1}
             v2: ${order.v2}
             v1: ${order.v1}
-            tsunami: ${order.tsunami})
+            tsunami: ${order.tsunami}
+            basevolume: ${order.basevolume}
             \n`;
     }
 return msg + '\n';
