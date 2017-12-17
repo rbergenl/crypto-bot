@@ -121,7 +121,6 @@ if (moment().hours() != 0) {
         
         // only orders from past 24h
         for (let previousReport of bittrexTsunami) {
-            console.log(report)
             for (let cancelled of previousReport.ordersCancelled) {
                 let cancelledOrder = await bittrexAPI.getOrder(cancelled.id)
                 report.orders.push({
@@ -150,12 +149,13 @@ if (moment().hours() != 0) {
             }
             
             for (let sold of previousReport.sellOrdersPlaced) {
+                let soldOrder = await bittrexAPI.getOrder(sold.id);
                 report.orders.push({
                     symbol: previousReport.calculatedOrders[0].marketName,
                     side: 'sell',
                     filled: previousReport.calculatedOrders[0].units,
                     price:  previousReport.calculatedOrders[0].targetPrice,
-                    time: moment(previousReport.selectedTickers[0].TimeStamp).format('HH:mm:ss')
+                    time: moment(soldOrder.datetime).format('HH:mm:ss')
                 });
             }
         }
