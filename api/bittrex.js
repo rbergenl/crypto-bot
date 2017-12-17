@@ -235,6 +235,8 @@ module.exports.cancelOrder = function(orderId) {
             (async () => {
                 let json = await bittrexCCXT.cancelOrder(orderId);
                 console.log('order cancelled: ' + json);
+                console.log('sleeping 3 seconds to wait for order to be cancelled and balances updated');
+                child_process.execSync('sleep 3');
                 resolve(json);
             })();
         }

@@ -36,7 +36,7 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
     let sellOrdersPlaced = [];
    
 
-
+/*
     //========== First cancel all outstanding sell orders that are overdue; so that basecurrency is freed up
     try {
         
@@ -65,7 +65,7 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
     catch(e) {
         util.throwError(e);
     }
-    
+*/    
     /*
     //========== For all the balance that is then still free; sell it for bid price (might be from 2 hours old sell order; possible loss)
     try {
