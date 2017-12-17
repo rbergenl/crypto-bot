@@ -155,7 +155,7 @@ if (moment().hours() != 0) {
                     side: 'sell',
                     filled: previousReport.calculatedOrders[0].units,
                     price:  previousReport.calculatedOrders[0].targetPrice,
-                    time: moment(soldOrder.datetime).format('HH:mm:ss')
+                    time: moment(soldOrder.info.Closed).format('HH:mm:ss')
                 });
             }
         }
