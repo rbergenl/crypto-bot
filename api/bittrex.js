@@ -127,6 +127,9 @@ module.exports.buyOrder = function(market, units, price) {
                 // Bittrex does not allow MarketBuyOrder placed by bots, only limitBuyOrder
                 try {
                     let json = await bittrexCCXT.createLimitBuyOrder(symbol, units, price);
+                     // wait 10 seconds for the buy order to be processed; then cancel open standing buy orders
+                    console.log('sleeping 10 seconds wait for buy order to be filled');
+                    child_process.execSync('sleep 10');
                     resolve(json);
                 }
                 catch (e) {
@@ -135,6 +138,9 @@ module.exports.buyOrder = function(market, units, price) {
                             // try again with original market symbol
                             console.log(`placing order (try again), but now for: ${symbol} ${units} * ${price}`);
                             let json = await bittrexCCXT.createLimitBuyOrder(market, units, price);
+                            // wait 10 seconds for the buy order to be processed; then cancel open standing buy orders
+                            console.log('sleeping 10 seconds wait for buy order to be filled');
+                            child_process.execSync('sleep 10');
                             resolve(json);
                         }
                         catch(e) {

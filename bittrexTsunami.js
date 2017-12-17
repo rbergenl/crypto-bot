@@ -215,11 +215,6 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
     
     
     //================== Now cancel if buy order is still open
-    
-    // wait 10 seconds for the buy order to be processed; then cancel open standing buy orders
-    console.log('sleeping 10 seconds before executing api calls');
-    child_process.execSync('sleep 10');
-    
     try {
         
         bittrexOpenOrders = await bittrexAPI.getOpenOrders();
