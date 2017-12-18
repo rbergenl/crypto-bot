@@ -48,8 +48,21 @@ function currentPortfolio(currentReport) {
             v2: ${order.v2}
             v1: ${order.v1}
             tsunami: ${order.tsunami}
-            basevolume: ${order.basevolume}
-            \n`;
+            basevolume: ${order.basevolume}`;
+            
+            for(let entry in order.orderbook) {
+               msg += `${entry}: ${order.orderbook[entry]} `; 
+            }
+            
+            if (order.USDT_BTC)  msg += `
+                USDT_BTC_h24: ${order.USDT_BTC.price_change_24h}
+                USDT_BTC_h2: ${order.USDT_BTC.price_change_2h}
+                USDT_BTC_h1: ${order.USDT_BTC.price_change_1h}
+                USDT_BTC_v2: ${order.USDT_BTC.volume_change_2h}
+                USDT_BTC_v1: ${order.USDT_BTC.volume_change_1h}
+                `;
+            
+            msg += '\n';
     }
 return msg + '\n';
 

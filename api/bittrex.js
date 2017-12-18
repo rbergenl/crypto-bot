@@ -36,6 +36,7 @@ module.exports.getMarketsSummaries = function(options = {}) {
         if (local) {
             return resolve(require('../test/bittrex/bittrex-marketsSummaries.json'));
         } else {
+            console.log('fetching market summaries');
             request('https://bittrex.com/api/v1.1/public/getmarketsummaries', function (error, response, body) {
               if (!error && response.statusCode == 200) {
                 var fetchedJson = JSON.parse(body);
@@ -61,7 +62,7 @@ module.exports.getMarketsSummaries = function(options = {}) {
                     
                     // add extra calculated properties
                     var calculatedJson = fetchedJson.result.map((ticker) => {
-                        ticker.price_change_24h = (1 - (ticker.PrevDay / ticker.Last)) * 100;
+
                         ticker.spread = (1 - (ticker.Bid / ticker.Ask)) * 100;
                         ticker.symbol = ticker.MarketName.split('-')[1];
                         
@@ -73,6 +74,8 @@ module.exports.getMarketsSummaries = function(options = {}) {
                         ticker.volume_change_1h = (1 - (ticker.BaseVolume / prevVolume1h)) * 100;
                         ticker.volume_change_2h = (1 - (ticker.BaseVolume / prevVolume2h)) * 100;
                         
+                        ticker.price_change_24h = (1 - (ticker.PrevDay / ticker.Last)) * 100;
+                        
                         var prevPrice1h = sameMarket1h ? sameMarket1h.Last : ticker.Last;
                         var prevPrice2h = sameMarket2h ? sameMarket2h.Last : ticker.Last;
                         ticker.price_change_1h = (1 - (ticker.Last / prevPrice1h)) * 100;
@@ -81,6 +84,13 @@ module.exports.getMarketsSummaries = function(options = {}) {
                         return ticker;
                     });
                 
+                    // attach BTC behavior to each ticker; to be able to select ticker based on this data
+                    calculatedJson = calculatedJson.map((ticker) => {
+                        // if not itself (otherwise will get circular)
+                        if (ticker.MarketName != 'USDT-BTC') ticker.USDT_BTC = calculatedJson.find(x => x.MarketName === 'USDT-BTC');
+                        return ticker; 
+                    });
+                    
                     if (options.save) await util.writeJSON(SLUG, calculatedJson);
                 //    console.log(calculatedJson)
                     resolve(calculatedJson);
@@ -279,26 +289,102 @@ module.exports.fetchOrderBook = function(market) {
                         reject(e);
                     }
                 }
-                json.bids = json.bids.slice(0, 250);
-                json.asks = json.asks.slice(0, 250);
                 
-                json.bids = json.bids.map(function(row){
-                    return row[0] * row[1];
-                });
-                json.bidsBTC = 0;
-                json.bids.forEach(function(rowBTC){
-                    json.bidsBTC += rowBTC;
-                });
+                // amount of orders (grouped)
+                json.bidsAllOrderCount = json.bids.length;
+                json.asksAllOrderCount = json.asks.length;
                 
-                json.asks = json.asks.map(function(row){
-                    return row[0] * row[1];
+                // calucalate total bids and asks value
+                json.bidsAllBTC = 0;
+                json.bids.map(function(row){
+                    let rowBTC = row[0] * row[1];
+                    json.bidsAllBTC += rowBTC;
+                    return rowBTC;
                 });
-                json.asksBTC = 0;
-                json.asks.forEach(function(rowBTC){
-                    json.asksBTC += rowBTC;
+                json.bidsAllBTC = parseFloat(json.bidsAllBTC).toFixed(2);
+                
+                json.asksAllBTC = 0;
+                json.asks.map(function(row){
+                    let rowBTC = row[0] * row[1];
+                    json.asksAllBTC += rowBTC;
+                    return rowBTC;
                 });
-                json.bidsTsunamiScore = parseFloat((json.bidsBTC / json.asksBTC).toFixed(2));
-
+                json.asksAllBTC = parseFloat(json.asksAllBTC).toFixed(2);
+                
+                // the difference between the total bids BTC value and the total asks BTC value (1 when equal; 0.5 when more asks; 2 when more bids)
+                json.tsunamiAll = parseFloat((json.bidsAllBTC / json.asksAllBTC).toFixed(2));
+                
+                
+                // now calculate with only the first 250 orders on each side
+                json.bids250BTC = 0;
+                json.bids.slice(0, 250).map(function(row){
+                    let rowBTC = row[0] * row[1];
+                    json.bids250BTC += rowBTC;
+                    return rowBTC;
+                });
+                json.bids250BTC = parseFloat(json.bids250BTC).toFixed(2);
+                
+                json.asks250BTC = 0;
+                json.asks.slice(0, 250).map(function(row){
+                    let rowBTC = row[0] * row[1];
+                    json.asks250BTC += rowBTC;
+                    return rowBTC;
+                });
+                json.asks250BTC = parseFloat(json.asks250BTC).toFixed(2);
+                
+                // the difference between the first 250 bids BTC value ...
+                json.tsunami250 = parseFloat((json.bids250BTC / json.asks250BTC).toFixed(2));
+                
+                
+                // now calculate with only the first 20 orders on each side
+                json.bids20BTC = 0;
+                json.bids.slice(0, 20).map(function(row){
+                    let rowBTC = row[0] * row[1];
+                    json.bids20BTC += rowBTC;
+                    return rowBTC;
+                });
+                json.bids20BTC = parseFloat(json.bids20BTC).toFixed(2);
+                
+                json.asks20BTC = 0;
+                json.asks.slice(0, 20).map(function(row){
+                    let rowBTC = row[0] * row[1];
+                    json.asks20BTC += rowBTC;
+                    return rowBTC;
+                });
+                json.asks20BTC = parseFloat(json.asks20BTC).toFixed(2);
+                
+                // the difference between the first 20 bids BTC value ...
+                json.tsunami20 = parseFloat((json.bids20BTC / json.asks20BTC).toFixed(2));
+                
+                
+                json.latestAsk = json.asks[0][0];
+                json.askOnePercent = parseFloat((json.latestAsk * 1.01).toFixed(8));
+                json.askTwoPercent = parseFloat((json.latestAsk * 1.02).toFixed(8));
+                
+                // how many orders are between the current ask price and 1% above that price
+                // how much total btc value is between the current ask price and 1% above that price
+                json.onePercentBTC = 0;
+                json.onePercentOrderCount = 0;
+                json.twoPercentBTC = 0;
+                json.twoPercentOrderCount = 0;
+                for (let row of json.asks) {
+                    if (row[0] < json.askOnePercent) {
+                        json.onePercentOrderCount++;
+                        json.onePercentBTC += row[0] * row[1];
+                        
+                    }
+                    if (row[0] < json.askTwoPercent) {
+                        json.twoPercentOrderCount++;
+                        json.twoPercentBTC += row[0] * row[1];
+                    }
+                }
+                json.onePercentBTC = parseFloat(json.onePercentBTC).toFixed(2);
+                json.twoPercentBTC = parseFloat(json.twoPercentBTC).toFixed(2);
+                
+                // empty the long list of orders
+                json.asks = ['has_been_emptied_to_save_storage'];
+                json.bids = ['has_been_emptied_to_save_storage'];
+                
                 resolve(json);
             }
         })();

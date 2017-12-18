@@ -124,16 +124,19 @@ if (moment().hours() != 0) {
             for (let cancelled of previousReport.ordersCancelled) {
                 let cancelledOrder = await bittrexAPI.getOrder(cancelled.id)
                 report.orders.push({
+                    date: moment(cancelledOrder.datetime).format('YYYYMMDD'),
+                    time: moment(cancelledOrder.datetime).format('HH:mm:ss'),
                     symbol: cancelledOrder.symbol,
                     side:'cancelled',
                     filled: cancelledOrder.filled,
-                    price: cancelledOrder.price,
-                    time: moment(cancelledOrder.datetime).format('HH:mm:ss')
+                    price: cancelledOrder.price
                 });
             }
             
             for (let bought of previousReport.buyOrdersPlaced) {
                 report.orders.push({
+                    date: moment(previousReport.selectedTickers[0].TimeStamp).format('YYYYMMDD'),
+                    time: moment(previousReport.selectedTickers[0].TimeStamp).format('HH:mm:ss'),
                     symbol: previousReport.buyOrders[0].market,
                     side: 'buy',
                     filled: previousReport.buyOrders[0].units,
@@ -143,20 +146,24 @@ if (moment().hours() != 0) {
                     h1: previousReport.selectedTickers[0].price_change_1h.toFixed(2),
                     v2: previousReport.selectedTickers[0].volume_change_2h.toFixed(2),
                     v1: previousReport.selectedTickers[0].volume_change_1h.toFixed(2),
-                    tsunami: previousReport.selectedTickers[0].bidsTsunamiScore,
+                    tsunami: previousReport.selectedTickers[0].orderBook ? previousReport.selectedTickers[0].orderBook.tsunami250 : previousReport.selectedTickers[0].bidsTsunamiScore,
                     basevolume: previousReport.selectedTickers[0].BaseVolume.toFixed(0),
-                    time: moment(previousReport.selectedTickers[0].TimeStamp).format('HH:mm:ss')
+                    buyorders: previousReport.selectedTickers[0].OpenBuyOrders,
+                    sellorders: previousReport.selectedTickers[0].OpenSellOrders,
+                    orderbook: previousReport.selectedTickers[0].orderBook ? previousReport.selectedTickers[0].orderBook : null,
+                    USDT_BTC: previousReport.selectedTickers[0].USDT_BTC ? previousReport.selectedTickers[0].USDT_BTC : null
                 });
             }
             
             for (let sold of previousReport.sellOrdersPlaced) {
                 let soldOrder = await bittrexAPI.getOrder(sold.id);
                 report.orders.push({
+                    date: moment(soldOrder.info.Closed).format('YYYYMMDD'),
+                    time: moment(soldOrder.info.Closed).format('HH:mm:ss'),
                     symbol: previousReport.calculatedOrders[0].marketName,
                     side: 'sell',
                     filled: previousReport.calculatedOrders[0].units,
-                    price:  previousReport.calculatedOrders[0].targetPrice,
-                    time: moment(soldOrder.info.Closed).format('HH:mm:ss')
+                    price:  previousReport.calculatedOrders[0].targetPrice
                 });
             }
         }
@@ -193,7 +200,7 @@ if (moment().hours() != 0) {
         util.throwError(e);
     }
     
-    // await util.writeJSON(SLUG, report, {toFile:true});
+    //     await util.writeJSON(SLUG, report, {toFile:true});
     await util.writeJSON(SLUG, report);
    // console.log(report);  // and write to console for build log
     

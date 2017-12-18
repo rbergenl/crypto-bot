@@ -109,6 +109,7 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
     try {
         
         bittrexMarketSummaries = await bittrexAPI.getMarketsSummaries({save:true});
+       // bittrexMarketSummaries = await bittrexAPI.getMarketsSummaries({save:false});
 
         // select only desired tickers
         selectedTickers
@@ -143,11 +144,9 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
         let index = 0;
         let orderBook;
         for (let market of selectedTickers) {
-
             // check orderbook
             orderBook = await bittrexAPI.fetchOrderBook(market.MarketName);
-            
-            selectedTickers[index].bidsTsunamiScore = orderBook.bidsTsunamiScore;
+            selectedTickers[index].orderBook = orderBook;
             index++;
         }
 
@@ -158,7 +157,7 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
     
     // Then choose the one with the highest tsunamiScore
     selectedTickers.sort(function(a, b){
-        return a.bidsTsunamiScore - b.bidsTsunamiScore;
+        return a.orderBook.tsunami250 - b.orderBook.tsunami250;
     })
     // and that ascending order, make it descending (highest on top)
     .reverse();
@@ -166,7 +165,7 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
     //================= Continue from here with one selected ticker
     // only execute one order and if TsunamiScore is above 2
     let oneSelectedTicker = selectedTickers.slice(0, 1);
-    if (oneSelectedTicker[0] && oneSelectedTicker[0].bidsTsunamiScore < MIN_TSUNAMI_SCORE) oneSelectedTicker.splice(0, 1); // remove first item
+    if (oneSelectedTicker[0] && oneSelectedTicker[0].orderBook.tsunami250 < MIN_TSUNAMI_SCORE) oneSelectedTicker.splice(0, 1); // remove first item
 
     //================== Now create the buy orders based on available balance
     try {
@@ -282,6 +281,7 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
         sellOrdersPlaced: sellOrdersPlaced
     };
     
+   // await util.writeJSON(SLUG, jsonOut, {toFile:true});
     await util.writeJSON(SLUG, jsonOut);
     console.log(jsonOut); // and write to console for build log
     
