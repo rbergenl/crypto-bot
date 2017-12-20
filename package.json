@@ -25,6 +25,7 @@
     "aws-sdk": "2.163.0",
     "ccxt": "1.10.323",
     "fs-extra": "4.0.2",
+    "jsonexport": "2.0.11",
     "mailgun-js": "0.13.1",
     "moment": "2.19.3",
     "mongodb": "3.0.0-rc0",
