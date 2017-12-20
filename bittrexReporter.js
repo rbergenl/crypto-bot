@@ -1,5 +1,6 @@
 var moment = require('moment');
 var mailGun = require('mailgun-js');
+var Readable = require('stream').Readable;
 
 let bittrexAPI = require('./api/bittrex');
 var util = require('./util/util');
@@ -157,14 +158,16 @@ if (moment().hours() != 0) {
             
             for (let sold of previousReport.sellOrdersPlaced) {
                 let soldOrder = await bittrexAPI.getOrder(sold.id);
-                report.orders.push({
-                    date: moment(soldOrder.info.Closed).format('YYYYMMDD'),
-                    time: moment(soldOrder.info.Closed).format('HH:mm:ss'),
-                    symbol: previousReport.calculatedOrders[0].marketName,
-                    side: 'sell',
-                    filled: previousReport.calculatedOrders[0].units,
-                    price:  previousReport.calculatedOrders[0].targetPrice
-                });
+                if (soldOrder.status == 'closed') {
+                    report.orders.push({
+                        date: moment(soldOrder.info.Closed).format('YYYYMMDD'),
+                        time: moment(soldOrder.info.Closed).format('HH:mm:ss'),
+                        symbol: previousReport.calculatedOrders[0].marketName,
+                        side: 'sell',
+                        filled: previousReport.calculatedOrders[0].units,
+                        price:  previousReport.calculatedOrders[0].targetPrice
+                    });
+                }
             }
         }
 
@@ -176,16 +179,29 @@ if (moment().hours() != 0) {
     //======================= Get the trend, attach it to the report and send it via email
     var text = bittrexTrend.getText(report);
     report['trend'] = text;
+    var csvOrders = await util.JSONtoCSV(report.orders);
+
+    var stream = new Readable;
+    stream.push(csvOrders);    // the string you want
+    stream.push(null);      // indicates end-of-file basically - the end of the stream
     
     try {
         var api_key = process.env.MAILGUN_API_KEY;
         var domain = 'sandbox811c617bc5884829bca1a2b832d887c2.mailgun.org';
         var mailgun = mailGun({apiKey: api_key, domain: domain});
         
+        var attachment = new mailgun.Attachment({
+            data: stream,
+            filename: moment().format('YYYYMMDD') + '_orders.csv',
+            knownLength: Buffer.byteLength(csvOrders, 'utf8'),
+            contentType: 'text/csv'
+        });
+        
         var data = {
           from: 'Crypto Bot <me@samples.mailgun.org>',
           to: process.env.MAILGUN_TO_EMAIL,
           subject: 'Daily Bittrex BTC Status',
+          attachment: attachment,
           text: text
         };
         
@@ -200,9 +216,10 @@ if (moment().hours() != 0) {
         util.throwError(e);
     }
     
-    //     await util.writeJSON(SLUG, report, {toFile:true});
     await util.writeJSON(SLUG, report);
    // console.log(report);  // and write to console for build log
+   //     await util.writeJSON(SLUG, report, {toFile:true});
+   // await util.writeJSON(SLUG, report.orders, {toFile:true, asCSV: true});
     
 })();
 

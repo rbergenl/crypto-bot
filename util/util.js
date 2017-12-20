@@ -1,6 +1,8 @@
 var fs = require('fs-extra');
 var path = require('path');
 var moment = require('moment');
+var jsonexport = require('jsonexport');
+
 var dynamo = require('../api/dynamo');
 var mlab = require('../api/mlab');
 
@@ -14,19 +16,35 @@ module.exports.writeJSON = function(slug, data, options) {
     return new Promise(function (resolve, reject){
         (async () => {
             if (options && options.toFile == true) {
+                
                 let outDir = path.join(rootDir, slug);
                 // make sure the outDir exists
                 fs.mkdirsSync(outDir);
-                let outFile = path.join(outDir, dateTimeStamp + '.json');
-           
-                fs.writeFile(outFile, JSON.stringify(data, null, 4), function(err) {
-                    if(err) {
-                        require('./util').throwError(err);
-                        reject();
-                    }
-                    console.log("Saved: " + outFile);
-                    resolve();
-                });
+                
+                if(options.asCSV == true) {
+                    let outFile = path.join(outDir, dateTimeStamp + '.csv');
+                    require('./util').JSONtoCSV(data).then(function(csv_out){
+                        fs.writeFile(outFile, csv_out, function(err) {
+                            if(err) {
+                                require('./util').throwError(err);
+                                reject();
+                            }
+                            console.log("Saved: " + outFile);
+                            resolve();
+                        });
+                    });
+                    
+                } else {
+                    let outFile = path.join(outDir, dateTimeStamp + '.json');
+                    fs.writeFile(outFile, JSON.stringify(data, null, 4), function(err) {
+                        if(err) {
+                            require('./util').throwError(err);
+                            reject();
+                        }
+                        console.log("Saved: " + outFile);
+                        resolve();
+                    });
+                }
             } else {
                 await mlab.save(slug, dateTimeStamp, data);
                 resolve();
@@ -80,6 +98,14 @@ module.exports.readJSON = function(slug, options) {
     });
 };
 
+module.exports.JSONtoCSV = function(json) {
+    return new Promise(function (resolve, reject){
+        jsonexport(json,function(err, csv){
+            if(err) reject(err);
+            resolve(csv);
+        });
+    });
+};
 
 module.exports.throwError = function(e){
     //require('./util').writeJSON('error', e);

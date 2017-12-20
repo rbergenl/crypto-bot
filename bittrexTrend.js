@@ -40,29 +40,7 @@ function currentPortfolio(currentReport) {
     
 `;
     for(let order of currentReport.orders) {
-        msg += `${order.time} - ${order.symbol} - ${order.side} - ${order.filled} * ${order.price} = ${parseFloat((order.filled*order.price).toFixed(8))}\n`;
-        if (order.tsunami) msg += `
-            h24: ${order.h24}
-            h2: ${order.h2}
-            h1: ${order.h1}
-            v2: ${order.v2}
-            v1: ${order.v1}
-            tsunami: ${order.tsunami}
-            basevolume: ${order.basevolume}`;
-            
-            for(let entry in order.orderbook) {
-               msg += `${entry}: ${order.orderbook[entry]} `; 
-            }
-            
-            if (order.USDT_BTC)  msg += `
-                USDT_BTC_h24: ${order.USDT_BTC.price_change_24h}
-                USDT_BTC_h2: ${order.USDT_BTC.price_change_2h}
-                USDT_BTC_h1: ${order.USDT_BTC.price_change_1h}
-                USDT_BTC_v2: ${order.USDT_BTC.volume_change_2h}
-                USDT_BTC_v1: ${order.USDT_BTC.volume_change_1h}
-                `;
-            
-            msg += '\n';
+        msg += `${order.date} ${order.time} - ${order.symbol} - ${order.side} - ${order.filled} * ${order.price} = ${parseFloat((order.filled*order.price).toFixed(8))}\n`;
     }
 return msg + '\n';
 
