@@ -382,8 +382,8 @@ module.exports.fetchOrderBook = function(market) {
                 json.twoPercentBTC = parseFloat(json.twoPercentBTC).toFixed(2);
                 
                 // empty the long list of orders
-                json.asks = ['has_been_emptied_to_save_storage'];
-                json.bids = ['has_been_emptied_to_save_storage'];
+                json.asks = ['emptied_to_save_storage'];
+                json.bids = ['emptied_to_save_storage'];
                 
                 resolve(json);
             }
