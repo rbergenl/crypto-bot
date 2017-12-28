@@ -16,7 +16,7 @@ module.exports.getText = function(report) {
     
     if (currentReport.value_btc_change_7d == 0 || currentReport.value_btc_change_7d == null)
         currentReport.value_btc_change_7d = 0.01;
-    currentReport['value_btc_change_7d_percent'] = 1 + (currentReport.value_btc_change_7d / 100);
+    currentReport['value_btc_change_7d_percent'] = 1 + (currentReport.value_btc_change_7d);
 
     let text = currentPortfolio(currentReport)
             + whenMillionaire(currentReport, 0)
