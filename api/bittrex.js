@@ -87,12 +87,29 @@ module.exports.getMarketsSummaries = function(options = {}) {
                     // attach BTC behavior to each ticker; to be able to select ticker based on this data
                     calculatedJson = calculatedJson.map((ticker) => {
                         // if not itself (otherwise will get circular)
-                        if (ticker.MarketName != 'USDT-BTC') ticker.USDT_BTC = calculatedJson.find(x => x.MarketName === 'USDT-BTC');
+                        if (ticker.MarketName != 'USDT-BTC') {
+                            // first attach the full usdt-btc market info to the ticker
+                            ticker.USDT_BTC = calculatedJson.find(x => x.MarketName === 'USDT-BTC');
+                            
+                            // now add even more calculated fields
+                            ticker.sym_ratio_h2_h1 = ticker.price_change_1h / ticker.price_change_2h;
+                            ticker.sym_diff_h2_h1 = ticker.price_change_2h - ticker.price_change_1h;
+                            ticker.sym_diff_v2_v1 = ticker.volume_change_2h - ticker.volume_change_1h;
+                            
+                            ticker.btc_ratio_h2_h1 = ticker.USDT_BTC.price_change_1h / ticker.USDT_BTC.price_change_2h;
+                            ticker.btc_ratio_v2_v1 = ticker.USDT_BTC.volume_change_2h / ticker.USDT_BTC.volume_change_1h;
+                            ticker.btc_diff_h2_h1 = ticker.USDT_BTC.price_change_2h - ticker.USDT_BTC.price_change_1h;
+                            
+                            ticker.sym_btc_ratio_h2 = ticker.USDT_BTC.price_change_2h / ticker.price_change_2h;
+                            ticker.sym_btc_ratio_h2_h1 = ticker.sym_ratio_h2_h1 / ticker.btc_ratio_h2_h1;
+                            ticker.sym_btc_diff_v1 = ticker.USDT_BTC.volume_change_1h - ticker.volume_change_1h;
+                        }
+
                         return ticker; 
                     });
                     
                     if (options.save) await util.writeJSON(SLUG, calculatedJson);
-                //    console.log(calculatedJson)
+                //    console.log(calculatedJson[0])
                     resolve(calculatedJson);
                 })();
               }

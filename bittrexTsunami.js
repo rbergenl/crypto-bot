@@ -122,7 +122,27 @@ const CANCEL_ORDER_AFTER_MILLISECONDS                       = (1000 * 60 * 60) *
                 && ticker.volume_change_2h > 0
                 && ticker.price_change_1h > 0
                 && ticker.price_change_2h > 0
-                && ticker.price_change_24h > 0; 
+                && ticker.price_change_24h > 0
+                
+                // check for advanced properties as found in the analysis (fast orders <1h and slow orders >h2)
+                && (ticker.sym_diff_h2_h1 < -3 || ticker.sym_diff_h2_h1 > 0.3)
+                
+                && ticker.sym_diff_v2_v1 < 12
+                
+                && ticker.btc_ratio_v2_v1 > -5
+                && ticker.btc_ratio_v2_v1 < 11
+                
+                && (ticker.btc_diff_h2_h1 < -0.4 || ticker.btc_diff_h2_h1 > 0.4)
+                
+                && ticker.sym_btc_ratio_h2 > -5
+                && ticker.sym_btc_ratio_h2 < 9
+                
+                && ticker.sym_btc_ratio_h2_h1 > -20
+                && ticker.sym_btc_ratio_h2_h1 < 20
+                
+                // smaler than zero; or between 1.5 and 4
+                && (ticker.sym_btc_diff_v1 < 0 || (ticker.sym_btc_diff_v1 > 1.5 && ticker.sym_btc_diff_v1 < 4));
+
         });
         
     }
