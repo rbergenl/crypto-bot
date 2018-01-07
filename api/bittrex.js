@@ -160,22 +160,18 @@ module.exports.buyOrder = function(market, units, price) {
                     resolve(json);
                 }
                 catch (e) {
-                    if (e.includes('does not have market symbol')) {
-                        try {
-                            // try again with original market symbol
-                            console.log(`placing order (try again), but now for: ${symbol} ${units} * ${price}`);
-                            let json = await bittrexCCXT.createLimitBuyOrder(market, units, price);
-                            // wait 10 seconds for the buy order to be processed; then cancel open standing buy orders
-                            console.log('sleeping 10 seconds wait for buy order to be filled');
-                            child_process.execSync('sleep 10');
-                            resolve(json);
-                        }
-                        catch(e) {
-                            reject(e);
-                        }
+                    //if (e.includes('does not have market symbol')) {
+                    console.log(e);
+                    try {
+                        // try again with original market symbol
+                        console.log(`placing order (try again), but now for: ${symbol} ${units} * ${price}`);
+                        let json = await bittrexCCXT.createLimitBuyOrder(market, units, price);
+                        // wait 10 seconds for the buy order to be processed; then cancel open standing buy orders
+                        console.log('sleeping 10 seconds wait for buy order to be filled');
+                        child_process.execSync('sleep 10');
+                        resolve(json);
                     }
-                    if (e.includes('INSUFFICIENT_FUNDS')) {
-                        console.log('error handled due to INSUFFICIENT_FUNDS');
+                    catch(e) {
                         reject(e);
                     }
                 }
@@ -293,7 +289,8 @@ module.exports.fetchOrderBook = function(market) {
                     json = await bittrexCCXT.fetchOrderBook(symbol);
                 }
                 catch (e) {
-                    if (e.includes('does not have market symbol')) {
+                    //if (e.includes('does not have market symbol')) { // got: e.includes is not a function
+                        console.log(e)
                         try {
                             // try again with original market symbol
                             console.log(`fetchin orderbook for: ${market} (try again)`);
@@ -302,9 +299,6 @@ module.exports.fetchOrderBook = function(market) {
                         catch (e) {
                             reject(e);
                         }
-                    } else {
-                        reject(e);
-                    }
                 }
                 
                 // amount of orders (grouped)
